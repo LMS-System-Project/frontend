@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GradeFlow - Instructor Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&amp;family=Fira+Code:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <style>
+    body {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+
+    :root {
+      --bg-primary: #0f1419;
+      --bg-secondary: #191d26;
+      --bg-tertiary: #242b38;
+      --text-primary: #ffffff;
+      --text-secondary: #8b92a0;
+      --accent-blue: #3b82f6;
+      --accent-purple: #8b5cf6;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #ef4444;
+    }
+
+    .glass-card {
+      background: rgba(25, 29, 38, 0.6);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(139, 146, 160, 0.12);
+      border-radius: 14px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.6); }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .animate-slide-in {
+      animation: slideIn 0.5s ease-out;
+    }
+
+    .pulse-glow {
+      animation: pulseGlow 3s ease-in-out infinite;
+    }
+
+    .stagger-1 { animation-delay: 0.05s; }
+    .stagger-2 { animation-delay: 0.1s; }
+    .stagger-3 { animation-delay: 0.15s; }
+    .stagger-4 { animation-delay: 0.2s; }
+    .stagger-5 { animation-delay: 0.25s; }
+
+    .card-hover {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 35px rgba(59, 130, 246, 0.15);
+    }
+
+    .progress-ring {
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+
+    .chart-bar {
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tab-button {
+      position: relative;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+
+    .tab-button.active {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .tab-button:not(.active) {
+      color: var(--text-secondary);
+      background: transparent;
+    }
+
+    .tab-button:hover:not(.active) {
+      background: rgba(139, 146, 160, 0.08);
+    }
+
+    .submission-item {
+      transition: all 0.3s ease;
+      border-left: 3px solid transparent;
+    }
+
+    .submission-item:hover {
+      background: rgba(59, 130, 246, 0.08);
+      border-left-color: #3b82f6;
+      transform: translateX(4px);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.375rem 0.875rem;
+      border-radius: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .status-submitted {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+    }
+
+    .status-pending {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+    }
+
+    .status-graded {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+    }
+
+    .status-missing {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+    }
+
+    .input-field {
+      background: rgba(139, 146, 160, 0.08);
+      border: 1px solid rgba(139, 146, 160, 0.15);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+
+    .input-field:focus {
+      outline: none;
+      background: rgba(139, 146, 160, 0.12);
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      color: white;
+      border: none;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: rgba(139, 146, 160, 0.12);
+      color: var(--text-secondary);
+      border: 1px solid rgba(139, 146, 160, 0.2);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(139, 146, 160, 0.18);
+      color: var(--text-primary);
+    }
+
+    .performance-bar {
+      height: 8px;
+      background: rgba(139, 146, 160, 0.2);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .performance-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      text-align: center;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.375rem;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -50px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .mini-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 100%;
+    }
+
+    .mini-chart-bar {
+      flex: 1;
+      border-radius: 1px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .mini-chart-bar:hover {
+      opacity: 0.8;
+    }
+
+    .score-input {
+      width: 60px;
+      text-align: center;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .score-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+
+    .insight-box {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+      border: 1px solid rgba(139, 146, 160, 0.15);
+      border-radius: 1rem;
+      padding: 1.25rem;
+    }
+
+    .weak-topic-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      padding: 0.375rem 0.75rem;
+      border-radius: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .strong-topic-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      padding: 0.375rem 0.75rem;
+      border-radius: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="bg-[var(--bg-primary)] text-[var(--text-primary)] overflow-x-hidden h-full">
+  <div id="app" class="h-full w-full flex flex-col overflow-auto"><!-- Header Navigation -->
+   <header class="glass-card m-4 md:m-6 sticky top-4 z-40">
+    <div class="max-w-full px-6 py-4 flex items-center justify-between">
+     <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+       <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+       </svg>
+      </div>
+      <div><span class="font-bold text-lg">GradeFlow</span>
+       <p class="text-xs text-[var(--text-secondary)]">Instructor Portal</p>
+      </div>
+     </div>
+     <nav class="hidden md:flex items-center gap-8"><a href="#" class="text-[var(--text-secondary)] hover:text-white transition-colors text-sm">Courses</a> <a href="#" class="text-[var(--text-secondary)] hover:text-white transition-colors text-sm">Students</a> <a href="#" class="text-[var(--text-secondary)] hover:text-white transition-colors text-sm">Assignments</a> <a href="#" class="text-[var(--text-secondary)] hover:text-white transition-colors text-sm">Analytics</a>
+     </nav>
+     <div class="flex items-center gap-3"><button class="p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+       </svg></button>
+      <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center font-bold text-sm cursor-pointer hover:shadow-lg transition-all">
+       SC
+      </div>
+     </div>
+    </div>
+   </header><!-- Main Content -->
+   <main class="flex-1 px-4 md:px-6 pb-6 space-y-6"><!-- Welcome Banner & Quick Stats -->
+    <div class="glass-card p-8 card-hover animate-fade-in stagger-1">
+     <div class="grid md:grid-cols-3 gap-8 items-center">
+      <div class="md:col-span-2 space-y-3">
+       <div>
+        <h1 class="text-4xl md:text-5xl font-bold">Welcome back, <span id="instructor-name" class="gradient-text">Dr. Sarah Chen</span></h1>
+        <p id="instructor-title" class="text-lg text-[var(--text-secondary)]">Computer Science Department</p>
+       </div>
+       <p class="text-base text-[var(--text-secondary)] max-w-2xl">You have <span class="text-blue-400 font-semibold">8 pending submissions</span> to review and <span class="text-amber-400 font-semibold">3 courses</span> running this semester.</p>
+      </div><!-- Quick Actions -->
+      <div class="space-y-3"><button class="btn-primary w-full flex items-center justify-center gap-2 py-3">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg> Create Assignment </button> <button class="btn-secondary w-full flex items-center justify-center gap-2 py-3">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg> View Schedule </button>
+      </div>
+     </div>
+    </div><!-- Tab Navigation -->
+    <div class="flex gap-2 overflow-x-auto pb-2 md:pb-0 animate-fade-in stagger-2"><button onclick="switchTab('courses')" class="tab-button active" id="tab-courses">
+      <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg> My Courses </button> <button onclick="switchTab('performance')" class="tab-button" id="tab-performance">
+      <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg> Analytics </button> <button onclick="switchTab('submissions')" class="tab-button" id="tab-submissions">
+      <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg> Submissions </button> <button onclick="switchTab('insights')" class="tab-button" id="tab-insights">
+      <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg> Insights </button>
+    </div><!-- Courses Tab -->
+    <div id="tab-content-courses" class="space-y-6">
+     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in stagger-3"><!-- Course 1 -->
+      <div class="glass-card p-6 card-hover relative overflow-hidden">
+       <div class="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full -mr-12 -mt-12"></div>
+       <div class="relative z-10">
+        <div class="flex items-start justify-between mb-4">
+         <div>
+          <h3 class="font-bold text-lg">CS 301</h3>
+          <p class="text-sm text-[var(--text-secondary)]">Data Structures</p>
+         </div><span class="px-2 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs font-medium">Active</span>
+        </div>
+        <div class="space-y-4">
+         <div>
+          <div class="flex justify-between text-sm mb-2"><span class="text-[var(--text-secondary)]">Enrollment</span> <span class="font-semibold">42 students</span>
+          </div>
+          <div class="performance-bar">
+           <div class="performance-bar-fill bg-gradient-to-r from-blue-500 to-blue-400" style="width: 85%"></div>
+          </div>
+         </div>
+         <div class="grid grid-cols-3 gap-2 text-center py-3 bg-black/30 rounded-lg">
+          <div>
+           <p class="text-2xl font-bold text-blue-400">18</p>
+           <p class="text-xs text-[var(--text-secondary)]">Submitted</p>
+          </div>
+          <div>
+           <p class="text-2xl font-bold text-amber-400">8</p>
+           <p class="text-xs text-[var(--text-secondary)]">Pending</p>
+          </div>
+          <div>
+           <p class="text-2xl font-bold text-emerald-400">16</p>
+           <p class="text-xs text-[var(--text-secondary)]">Graded</p>
+          </div>
+         </div>
+         <div class="flex gap-2"><button class="btn-primary flex-1 text-sm py-2">Manage</button> <button class="btn-secondary flex-1 text-sm py-2">View</button>
+         </div>
+        </div>
+       </div>
+      </div><!-- Course 2 -->
+      <div class="glass-card p-6 card-hover relative overflow-hidden">
+       <div class="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 rounded-full -mr-12 -mt-12"></div>
+       <div class="relative z-10">
+        <div class="flex items-start justify-between mb-4">
+         <div>
+          <h3 class="font-bold text-lg">CS 201</h3>
+          <p class="text-sm text-[var(--text-secondary)]">Web Development</p>
+         </div><span class="px-2 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs font-medium">Active</span>
+        </div>
+        <div class="space-y-4">
+         <div>
+          <div class="flex justify-between text-sm mb-2"><span class="text-[var(--text-secondary)]">Enrollment</span> <span class="font-semibold">38 students</span>
+          </div>
+          <div class="performance-bar">
+           <div class="performance-bar-fill bg-gradient-to-r from-purple-500 to-purple-400" style="width: 78%"></div>
+          </div>
+         </div>
+         <div class="grid grid-cols-3 gap-2 text-center py-3 bg-black/30 rounded-lg">
+          <div>
+           <p class="text-2xl font-bold text-blue-400">15</p>
+           <p class="text-xs text-[var(--text-secondary)]">Submitted</p>
+          </div>
+          <div>
+           <p class="text-2xl font-bold text-amber-400">12</p>
+           <p class="text-xs text-[var(--text-secondary)]">Pending</p>
+          </div>
+          <div>
+           <p class="text-2xl font-bold text-emerald-400">11</p>
+           <p class="text-xs text-[var(--text-secondary)]">Graded</p>
+          </div>
+         </div>
+         <div class="flex gap-2"><button class="btn-primary flex-1 text-sm py-2">Manage</button> <button class="btn-secondary flex-1 text-sm py-2">View</button>
+         </div>
+        </div>
+       </div>
+      </div><!-- Course 3 -->
+      <div class="glass-card p-6 card-hover relative overflow-hidden">
+       <div class="absolute top-0 right-0 w-24 h-24 bg-cyan-500/10 rounded-full -mr-12 -mt-12"></div>
+       <div class="relative z-10">
+        <div class="flex items-start justify-between mb-4">
+         <div>
+          <h3 class="font-bold text-lg">CS 401</h3>
+          <p class="text-sm text-[var(--text-secondary)]">Machine Learning</p>
+         </div><span class="px-2 py-1 rounded-full bg-cyan-500/20 text-cyan-400 text-xs font-medium">Active</span>
+        </div>
+        <div class="space-y-4">
+         <div>
+          <div class="flex justify-between text-sm mb-2"><span class="text-[var(--text-secondary)]">Enrollment</span> <span class="font-semibold">36 students</span>
+          </div>
+          <div class="performance-bar">
+           <div class="performance-bar-fill bg-gradient-to-r from-cyan-500 to-cyan-400" style="width: 92%"></div>
+          </div>
+         </div>
+         <div class="grid grid-cols-3 gap-2 text-center py-3 bg-black/30 rounded-lg">
+          <div>
+           <p class="text-2xl font-bold text-blue-400">24</p>
+           <p class="text-xs text-[var(--text-secondary)]">Submitted</p>
+          </div>
+          <div>
+           <p class="text-2xl font-bold text-amber-400">2</p>
+           <p class="text-xs text-[var(--text-secondary)]">Pending</p>
+          </div>
+          <div>
+           <p class="text-2xl font-bold text-emerald-400">10</p>
+           <p class="text-xs text-[var(--text-secondary)]">Graded</p>
+          </div>
+         </div>
+         <div class="flex gap-2"><button class="btn-primary flex-1 text-sm py-2">Manage</button> <button class="btn-secondary flex-1 text-sm py-2">View</button>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div><!-- Create Assignment Section -->
+     <div class="glass-card p-8 animate-fade-in stagger-4">
+      <h2 class="text-2xl font-bold mb-6">Create New Assignment</h2>
+      <div class="grid md:grid-cols-2 gap-6 mb-6">
+       <div><label class="block text-sm font-medium mb-2">Assignment Title</label> <input type="text" placeholder="e.g., Midterm Exam" class="input-field w-full">
+       </div>
+       <div><label class="block text-sm font-medium mb-2">Course</label> <select class="input-field w-full"> <option>CS 301 - Data Structures</option> <option>CS 201 - Web Development</option> <option>CS 401 - Machine Learning</option> </select>
+       </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6 mb-6">
+       <div><label class="block text-sm font-medium mb-2">Due Date</label> <input type="date" class="input-field w-full">
+       </div>
+       <div><label class="block text-sm font-medium mb-2">Total Points</label> <input type="number" placeholder="100" class="input-field w-full">
+       </div>
+      </div>
+      <div class="mb-6"><label class="block text-sm font-medium mb-2">Description</label> <textarea placeholder="Assignment details and instructions..." class="input-field w-full h-24 resize-none"></textarea>
+      </div>
+      <div class="flex gap-3"><button class="btn-primary py-3 px-6">Create Assignment</button> <button class="btn-secondary py-3 px-6">Save as Draft</button>
+      </div>
+     </div>
+    </div><!-- Performance Analytics Tab -->
+    <div id="tab-content-performance" class="hidden space-y-6"><!-- Course Performance Overview -->
+     <div class="glass-card p-8 animate-fade-in stagger-3">
+      <h2 class="text-2xl font-bold mb-6">Class Performance Overview</h2>
+      <div class="grid md:grid-cols-3 gap-6 mb-8">
+       <div class="glass-card p-6">
+        <div class="flex items-center justify-between mb-4"><span class="text-[var(--text-secondary)] text-sm font-medium">Class Average</span> <span class="text-emerald-400 text-sm font-medium">+2.3%</span>
+        </div>
+        <p class="text-4xl font-bold mb-2">78.5%</p>
+        <div class="performance-bar">
+         <div class="performance-bar-fill bg-gradient-to-r from-cyan-500 to-blue-500" style="width: 78%"></div>
+        </div>
+       </div>
+       <div class="glass-card p-6">
+        <div class="flex items-center justify-between mb-4"><span class="text-[var(--text-secondary)] text-sm font-medium">Highest Score</span> <span class="text-emerald-400 text-sm font-medium">A+</span>
+        </div>
+        <p class="text-4xl font-bold mb-2">95</p>
+        <p class="text-xs text-[var(--text-secondary)]">Alex Johnson - CS 301</p>
+       </div>
+       <div class="glass-card p-6">
+        <div class="flex items-center justify-between mb-4"><span class="text-[var(--text-secondary)] text-sm font-medium">Lowest Score</span> <span class="text-rose-400 text-sm font-medium">C-</span>
+        </div>
+        <p class="text-4xl font-bold mb-2">62</p>
+        <p class="text-xs text-[var(--text-secondary)]">Needs intervention</p>
+       </div>
+      </div><!-- Grade Distribution -->
+      <div class="grid lg:grid-cols-2 gap-6">
+       <div class="glass-card p-6">
+        <h3 class="font-bold mb-4">Grade Distribution</h3>
+        <div class="space-y-4">
+         <div>
+          <div class="flex items-center justify-between mb-1"><span class="text-sm">A (90-100)</span> <span class="text-sm font-medium">12 students</span>
+          </div>
+          <div class="performance-bar">
+           <div class="performance-bar-fill bg-gradient-to-r from-emerald-500 to-emerald-400" style="width: 29%"></div>
+          </div>
+         </div>
+         <div>
+          <div class="flex items-center justify-between mb-1"><span class="text-sm">B (80-89)</span> <span class="text-sm font-medium">18 students</span>
+          </div>
+          <div class="performance-bar">
+           <div class="performance-bar-fill bg-gradient-to-r from-blue-500 to-blue-400" style="width: 44%"></div>
+          </div>
+         </div>
+         <div>
+          <div class="flex items-center justify-between mb-1"><span class="text-sm">C (70-79)</span> <span class="text-sm font-medium">10 students</span>
+          </div>
+          <div class="performance-bar">
+           <div class="performance-bar-fill bg-gradient-to-r from-amber-500 to-amber-400" style="width: 24%"></div>
+          </div>
+         </div>
+         <div>
+          <div class="flex items-center justify-between mb-1"><span class="text-sm">D-F (Below 70)</span> <span class="text-sm font-medium">2 students</span>
+          </div>
+          <div class="performance-bar">
+           <div class="performance-bar-fill bg-gradient-to-r from-rose-500 to-rose-400" style="width: 5%"></div>
+          </div>
+         </div>
+        </div>
+       </div><!-- Performance Trend -->
+       <div class="glass-card p-6">
+        <h3 class="font-bold mb-4">Performance Trend</h3>
+        <div class="relative h-48">
+         <svg class="w-full h-full" viewbox="0 0 400 150"><defs>
+           <lineargradient id="perfGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.3" />
+            <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
+           </lineargradient>
+          </defs> <line x1="20" y1="30" x2="380" y2="30" stroke="rgba(139, 146, 160, 0.1)" stroke-width="1" /> <line x1="20" y1="75" x2="380" y2="75" stroke="rgba(139, 146, 160, 0.1)" stroke-width="1" /> <line x1="20" y1="120" x2="380" y2="120" stroke="rgba(139, 146, 160, 0.1)" stroke-width="1" /> <path d="M20 100 Q80 85, 140 70 T260 60 T380 40" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" /> <path d="M20 100 Q80 85, 140 70 T260 60 T380 40 L380 150 L20 150 Z" fill="url(#perfGradient)" />
+         </svg>
+        </div>
+        <div class="flex justify-between mt-4 text-xs text-[var(--text-secondary)]"><span>Week 1</span><span>Week 4</span><span>Week 8</span><span>Week 12</span>
+        </div>
+       </div>
+      </div>
+     </div><!-- Individual Student Performance -->
+     <div class="glass-card p-8 animate-fade-in stagger-4">
+      <h2 class="text-2xl font-bold mb-6">Top Performing Students</h2>
+      <div class="space-y-3"><!-- Student 1 -->
+       <div class="glass-card p-4 flex items-center justify-between">
+        <div class="flex items-center gap-4 flex-1">
+         <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center font-bold">
+          AJ
+         </div>
+         <div class="flex-1">
+          <p class="font-semibold">Alex Johnson</p>
+          <p class="text-xs text-[var(--text-secondary)]">CS 301 • 4/5 assignments completed</p>
+         </div>
+        </div>
+        <div class="text-right">
+         <p class="text-xl font-bold text-emerald-400">95%</p>
+         <p class="text-xs text-[var(--text-secondary)]">Grade: A+</p>
+        </div>
+       </div><!-- Student 2 -->
+       <div class="glass-card p-4 flex items-center justify-between">
+        <div class="flex items-center gap-4 flex-1">
+         <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center font-bold">
+          MK
+         </div>
+         <div class="flex-1">
+          <p class="font-semibold">Maria Kim</p>
+          <p class="text-xs text-[var(--text-secondary)]">CS 401 • 5/5 assignments completed</p>
+         </div>
+        </div>
+        <div class="text-right">
+         <p class="text-xl font-bold text-emerald-400">92%</p>
+         <p class="text-xs text-[var(--text-secondary)]">Grade: A</p>
+        </div>
+       </div><!-- Student 3 -->
+       <div class="glass-card p-4 flex items-center justify-between">
+        <div class="flex items-center gap-4 flex-1">
+         <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center font-bold">
+          JD
+         </div>
+         <div class="flex-1">
+          <p class="font-semibold">James Davis</p>
+          <p class="text-xs text-[var(--text-secondary)]">CS 201 • 3/4 assignments completed</p>
+         </div>
+        </div>
+        <div class="text-right">
+         <p class="text-xl font-bold text-emerald-400">88%</p>
+         <p class="text-xs text-[var(--text-secondary)]">Grade: B+</p>
+        </div>
+       </div>
+      </div>
+      <h2 class="text-2xl font-bold mt-8 mb-6">Students Needing Support</h2>
+      <div class="space-y-3"><!-- At Risk Student 1 -->
+       <div class="glass-card p-4 flex items-center justify-between border-l-2 border-rose-500">
+        <div class="flex items-center gap-4 flex-1">
+         <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-rose-400 to-rose-600 flex items-center justify-center font-bold">
+          RS
+         </div>
+         <div class="flex-1">
+          <p class="font-semibold">Ryan Smith</p>
+          <p class="text-xs text-[var(--text-secondary)]">CS 301 • 1/5 assignments completed</p>
+         </div>
+        </div>
+        <div class="text-right">
+         <p class="text-xl font-bold text-rose-400">62%</p>
+         <p class="text-xs text-[var(--text-secondary)]">Grade: C-</p>
+        </div>
+       </div><!-- At Risk Student 2 -->
+       <div class="glass-card p-4 flex items-center justify-between border-l-2 border-amber-500">
+        <div class="flex items-center gap-4 flex-1">
+         <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center font-bold">
+          LP
+         </div>
+         <div class="flex-1">
+          <p class="font-semibold">Lisa Park</p>
+          <p class="text-xs text-[var(--text-secondary)]">CS 201 • 2/4 assignments completed</p>
+         </div>
+        </div>
+        <div class="text-right">
+         <p class="text-xl font-bold text-amber-400">71%</p>
+         <p class="text-xs text-[var(--text-secondary)]">Grade: C</p>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div><!-- Submissions Tab -->
+    <div id="tab-content-submissions" class="hidden space-y-6">
+     <div class="glass-card p-8 animate-fade-in stagger-3">
+      <div class="flex items-center justify-between mb-6">
+       <h2 class="text-2xl font-bold">Submission Review</h2>
+       <div class="flex gap-2"><select class="input-field text-sm"> <option>All Courses</option> <option>CS 301 - Data Structures</option> <option>CS 201 - Web Development</option> <option>CS 401 - Machine Learning</option> </select> <select class="input-field text-sm"> <option>All Status</option> <option>Pending</option> <option>Submitted</option> <option>Graded</option> </select>
+       </div>
+      </div>
+      <div class="space-y-3"><!-- Submission 1 - Pending -->
+       <div class="submission-item glass-card p-5 rounded-lg">
+        <div class="grid md:grid-cols-4 gap-4 items-center">
+         <div>
+          <p class="font-semibold">Midterm Exam - CS 301</p>
+          <p class="text-xs text-[var(--text-secondary)]">Due: Today at 11:59 PM</p>
+         </div>
+         <div class="text-center">
+          <p class="text-sm font-medium">18/42</p>
+          <p class="text-xs text-[var(--text-secondary)]">Submitted</p>
+         </div>
+         <div class="flex gap-2 justify-center"><span class="status-badge status-submitted">✓ Submitted</span> <span class="status-badge status-pending">⏱ 24 Pending</span>
+         </div><button class="btn-primary text-sm py-2 px-4 justify-self-end">Review</button>
+        </div>
+       </div><!-- Submission 2 - Review -->
+       <div class="submission-item glass-card p-5 rounded-lg">
+        <div class="grid md:grid-cols-4 gap-4 items-center">
+         <div>
+          <p class="font-semibold">Lab Assignment #5 - CS 201</p>
+          <p class="text-xs text-[var(--text-secondary)]">Due: 2 days ago</p>
+         </div>
+         <div class="text-center">
+          <p class="text-sm font-medium">15/38</p>
+          <p class="text-xs text-[var(--text-secondary)]">Submitted</p>
+         </div>
+         <div class="flex gap-2 justify-center"><span class="status-badge status-graded">✓ Graded</span> <span class="status-badge status-pending">⏱ 23 Pending</span>
+         </div><button class="btn-primary text-sm py-2 px-4 justify-self-end">Grade More</button>
+        </div>
+       </div><!-- Submission 3 - Grading Panel -->
+       <div class="glass-card p-6 bg-blue-500/10 border border-blue-500/20">
+        <div class="mb-4">
+         <div class="flex items-center justify-between mb-3">
+          <div>
+           <p class="font-bold text-lg">Project Part 2 - CS 401</p>
+           <p class="text-sm text-[var(--text-secondary)]">Assignment • Due 3 days ago</p>
+          </div><span class="status-badge status-pending">⏱ 8 Pending Review</span>
+         </div>
+        </div><!-- Grading Interface -->
+        <div class="space-y-4"><!-- Student Submission 1 -->
+         <div class="glass-card p-4 flex items-center justify-between">
+          <div class="flex items-center gap-4 flex-1">
+           <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-sm font-bold">
+            JD
+           </div>
+           <div class="flex-1">
+            <p class="font-semibold text-sm">James Davis</p>
+            <p class="text-xs text-[var(--text-secondary)]">Submitted 2 hours ago</p>
+           </div>
+          </div>
+          <div class="flex items-center gap-3"><input type="number" min="0" max="100" placeholder="Score" class="score-input" value="85"> <span class="text-sm text-[var(--text-secondary)]">/ 100</span> <button class="px-4 py-2 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 text-sm font-medium transition-colors"> Grade </button>
+          </div>
+         </div><!-- Student Submission 2 -->
+         <div class="glass-card p-4 flex items-center justify-between">
+          <div class="flex items-center gap-4 flex-1">
+           <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-sm font-bold">
+            MK
+           </div>
+           <div class="flex-1">
+            <p class="font-semibold text-sm">Maria Kim</p>
+            <p class="text-xs text-[var(--text-secondary)]">Submitted 5 hours ago</p>
+           </div>
+          </div>
+          <div class="flex items-center gap-3"><input type="number" min="0" max="100" placeholder="Score" class="score-input" value="92"> <span class="text-sm text-[var(--text-secondary)]">/ 100</span> <button class="px-4 py-2 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 text-sm font-medium transition-colors"> Grade </button>
+          </div>
+         </div><!-- Student Submission 3 -->
+         <div class="glass-card p-4 flex items-center justify-between">
+          <div class="flex items-center gap-4 flex-1">
+           <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center text-sm font-bold">
+            AJ
+           </div>
+           <div class="flex-1">
+            <p class="font-semibold text-sm">Alex Johnson</p>
+            <p class="text-xs text-[var(--text-secondary)]">Submitted 1 day ago</p>
+           </div>
+          </div>
+          <div class="flex items-center gap-3"><input type="number" min="0" max="100" placeholder="Score" class="score-input" value="78"> <span class="text-sm text-[var(--text-secondary)]">/ 100</span> <button class="px-4 py-2 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 text-sm font-medium transition-colors"> Grade </button>
+          </div>
+         </div>
+        </div>
+        <div class="flex gap-2 mt-4"><button class="btn-primary flex-1 py-3">Save All Grades</button> <button class="btn-secondary flex-1 py-3">Save &amp; Continue</button>
+        </div>
+       </div><!-- Submission 4 -->
+       <div class="submission-item glass-card p-5 rounded-lg">
+        <div class="grid md:grid-cols-4 gap-4 items-center">
+         <div>
+          <p class="font-semibold">Quiz Chapter 7 - CS 301</p>
+          <p class="text-xs text-[var(--text-secondary)]">Due: 5 days ago</p>
+         </div>
+         <div class="text-center">
+          <p class="text-sm font-medium">42/42</p>
+          <p class="text-xs text-[var(--text-secondary)]">Submitted</p>
+         </div>
+         <div class="flex gap-2 justify-center"><span class="status-badge status-graded">✓ All Graded</span>
+         </div><button class="btn-secondary text-sm py-2 px-4 justify-self-end">View Results</button>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div><!-- Insights Tab -->
+    <div id="tab-content-insights" class="hidden space-y-6">
+     <div class="glass-card p-8 animate-fade-in stagger-3">
+      <h2 class="text-2xl font-bold mb-6">Learning Insights &amp; Weak Topics</h2><!-- Course Performance Summary -->
+      <div class="grid md:grid-cols-3 gap-6 mb-8">
+       <div class="insight-box">
+        <div class="flex items-start justify-between mb-3">
+         <div>
+          <p class="text-sm text-[var(--text-secondary)]">Most Challenging Topic</p>
+          <p class="text-xl font-bold">Recursion</p>
+         </div>
+         <svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 4v2M4.22 4.22a9 9 0 0112.728 0m0 12.728a9 9 0 01-12.728 0M4.22 4.22l2.828 2.828m9.658 0l2.828-2.828m-9.658 16.728l-2.828-2.828m9.658 0l2.828 2.828" />
+         </svg>
+        </div>
+        <p class="text-sm text-[var(--text-secondary)]">34% of students scored below 70% in this topic</p><button class="mt-3 text-xs text-blue-400 hover:text-blue-300">Create review materials →</button>
+       </div>
+       <div class="insight-box">
+        <div class="flex items-start justify-between mb-3">
+         <div>
+          <p class="text-sm text-[var(--text-secondary)]">Strongest Topic</p>
+          <p class="text-xl font-bold">Arrays &amp; Lists</p>
+         </div>
+         <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+         </svg>
+        </div>
+        <p class="text-sm text-[var(--text-secondary)]">89% of students scored above 80% in this topic</p><button class="mt-3 text-xs text-blue-400 hover:text-blue-300">View success strategies →</button>
+       </div>
+       <div class="insight-box">
+        <div class="flex items-start justify-between mb-3">
+         <div>
+          <p class="text-sm text-[var(--text-secondary)]">Improvement Needed</p>
+          <p class="text-xl font-bold">Complexity Analysis</p>
+         </div>
+         <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+         </svg>
+        </div>
+        <p class="text-sm text-[var(--text-secondary)]">55% of students need additional practice</p><button class="mt-3 text-xs text-blue-400 hover:text-blue-300">Assign practice problems →</button>
+       </div>
+      </div><!-- Topic Performance Breakdown -->
+      <div class="mb-8">
+       <h3 class="font-bold text-lg mb-4">CS 301 - Topic Performance Breakdown</h3>
+       <div class="space-y-4"><!-- Topic 1 -->
+        <div class="glass-card p-4">
+         <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-3"><span class="font-semibold">Sorting Algorithms</span>
+           <div class="strong-topic-badge">
+            <svg class="w-3 h-3" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M12 7a1 1 0 110-2 1 1 0 010 2zM9 9a1 1 0 100-2 1 1 0 000 2zm6 0a1 1 0 100-2 1 1 0 000 2zM9 15a1 1 0 100-2 1 1 0 000 2zm6 0a1 1 0 100-2 1 1 0 000 2z" />
+            </svg> Strong
+           </div>
+          </div><span class="font-bold">84%</span>
+         </div>
+         <div class="performance-bar">
+          <div class="performance-bar-fill bg-gradient-to-r from-emerald-500 to-emerald-400" style="width: 84%"></div>
+         </div>
+        </div><!-- Topic 2 -->
+        <div class="glass-card p-4">
+         <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-3"><span class="font-semibold">Recursion</span>
+           <div class="weak-topic-badge">
+            <svg class="w-3 h-3" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zm-11-1a1 1 0 11-2 0 1 1 0 012 0z" />
+            </svg> Weak
+           </div>
+          </div><span class="font-bold">62%</span>
+         </div>
+         <div class="performance-bar">
+          <div class="performance-bar-fill bg-gradient-to-r from-rose-500 to-rose-400" style="width: 62%"></div>
+         </div>
+        </div><!-- Topic 3 -->
+        <div class="glass-card p-4">
+         <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-3"><span class="font-semibold">Binary Search Trees</span>
+           <div class="weak-topic-badge">
+            <svg class="w-3 h-3" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zm-11-1a1 1 0 11-2 0 1 1 0 012 0z" />
+            </svg> Weak
+           </div>
+          </div><span class="font-bold">68%</span>
+         </div>
+         <div class="performance-bar">
+          <div class="performance-bar-fill bg-gradient-to-r from-amber-500 to-amber-400" style="width: 68%"></div>
+         </div>
+        </div><!-- Topic 4 -->
+        <div class="glass-card p-4">
+         <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-3"><span class="font-semibold">Arrays &amp; Lists</span>
+           <div class="strong-topic-badge">
+            <svg class="w-3 h-3" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M12 7a1 1 0 110-2 1 1 0 010 2zM9 9a1 1 0 100-2 1 1 0 000 2zm6 0a1 1 0 100-2 1 1 0 000 2zM9 15a1 1 0 100-2 1 1 0 000 2zm6 0a1 1 0 100-2 1 1 0 000 2z" />
+            </svg> Strong
+           </div>
+          </div><span class="font-bold">89%</span>
+         </div>
+         <div class="performance-bar">
+          <div class="performance-bar-fill bg-gradient-to-r from-emerald-500 to-emerald-400" style="width: 89%"></div>
+         </div>
+        </div><!-- Topic 5 -->
+        <div class="glass-card p-4">
+         <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-3"><span class="font-semibold">Complexity Analysis</span>
+           <div class="weak-topic-badge">
+            <svg class="w-3 h-3" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zm-11-1a1 1 0 11-2 0 1 1 0 012 0z" />
+            </svg> Weak
+           </div>
+          </div><span class="font-bold">59%</span>
+         </div>
+         <div class="performance-bar">
+          <div class="performance-bar-fill bg-gradient-to-r from-rose-500 to-rose-400" style="width: 59%"></div>
+         </div>
+        </div>
+       </div>
+      </div><!-- Recommendations -->
+      <div class="glass-card p-6 bg-emerald-500/10 border border-emerald-500/20">
+       <div class="flex items-start gap-4">
+        <div class="w-12 h-12 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+         <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+         </svg>
+        </div>
+        <div>
+         <h3 class="font-bold mb-2">AI-Powered Recommendations</h3>
+         <ul class="text-sm text-[var(--text-secondary)] space-y-2">
+          <li>• Schedule additional office hours for Recursion and BST topics (26 students affected)</li>
+          <li>• Create 15-minute video tutorials for Complexity Analysis concepts</li>
+          <li>• Consider peer tutoring program: pair strong students with struggling learners</li>
+          <li>• Allocate 20% of next lecture to Recursion review and practice problems</li>
+         </ul>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </main>
+  </div>
+  <script>
+    // Initialize Element SDK
+    const defaultConfig = {
+      instructor_name: "Dr. Sarah Chen",
+      instructor_title: "Computer Science Department",
+      dashboard_title: "Instructor Dashboard"
+    };
+
+    let config = { ...defaultConfig };
+
+    window.elementSdk?.init({
+      defaultConfig,
+      onConfigChange: (newConfig) => {
+        config = newConfig;
+        document.getElementById('instructor-name').textContent = config.instructor_name || defaultConfig.instructor_name;
+        document.getElementById('instructor-title').textContent = config.instructor_title || defaultConfig.instructor_title;
+      },
+      mapToCapabilities: () => ({
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      }),
+      mapToEditPanelValues: () => new Map([
+        ['instructor_name', config.instructor_name],
+        ['instructor_title', config.instructor_title],
+        ['dashboard_title', config.dashboard_title]
+      ])
+    });
+
+    // Tab switching functionality
+    function switchTab(tabName) {
+      // Hide all tab contents
+      document.querySelectorAll('[id^="tab-content-"]').forEach(el => {
+        el.classList.add('hidden');
+      });
+      
+      // Remove active state from all tabs
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Show selected tab content
+      const contentElement = document.getElementById(`tab-content-${tabName}`);
+      if (contentElement) {
+        contentElement.classList.remove('hidden');
+      }
+      
+      // Mark selected tab as active
+      const tabBtn = document.getElementById(`tab-${tabName}`);
+      if (tabBtn) {
+        tabBtn.classList.add('active');
+      }
+    }
+
+    // Stagger animations on load
+    document.querySelectorAll('[class*="stagger-"]').forEach(el => {
+      el.classList.add('animate-fade-in');
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c983712f2e27e93',t:'MTc3MDM1NTQwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
