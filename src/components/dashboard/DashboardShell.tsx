@@ -1,5 +1,4 @@
 import React from "react";
-import Sidebar from "./Sidebar";
 
 interface DashboardShellProps {
   role: "student" | "instructor" | "admin";
@@ -7,19 +6,16 @@ interface DashboardShellProps {
 }
 
 export default function DashboardShell({ role, children }: DashboardShellProps) {
+  // For instructor — the layout.tsx handles sidebar, so just render children
+  if (role === "instructor") {
+    return <div className="space-y-6 animate-fade-in">{children}</div>;
+  }
+
+  // For student/admin — fallback to a basic centered layout
   return (
     <div className="py-8">
-       <div className="max-w-7xl mx-auto px-6">
-        <div className="dashboard-panel">
-          <div className="gradient-border p-8 bg-background-card min-h-[800px]">
-            <div className="flex flex-col lg:flex-row gap-8">
-              <Sidebar role={role} />
-              <div className="flex-1 space-y-6">
-                {children}
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="space-y-6">{children}</div>
       </div>
     </div>
   );
