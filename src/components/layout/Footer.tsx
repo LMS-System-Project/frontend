@@ -1,121 +1,69 @@
 import Link from "next/link";
+import { BookOpen, Mail, Phone, Twitter, Github, Linkedin } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="py-12 border-t border-white/10 mt-auto">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid md:grid-cols-4 gap-8 mb-12">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl animated-gradient flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  />
-                </svg>
+    <footer className="bg-accent text-white py-20 border-t border-slate-800">
+      <div className="container mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+          <div className="col-span-1 md:col-span-1">
+            <Link href="/" className="flex items-center gap-2 mb-6">
+              <div className="bg-white p-1.5 rounded">
+                <BookOpen size={20} className="text-accent" />
               </div>
-              <span className="text-xl font-bold">GradeFlow</span>
-            </div>
-            <p className="text-text-secondary text-sm">
-              The next-generation learning management system for modern
-              education.
+              <span className="text-xl font-bold tracking-tight">GradeFlow</span>
+            </Link>
+            <p className="text-slate-400 text-sm leading-relaxed mb-8">
+              The professional standard for institutional learning and management lifecycle systems.
             </p>
+            <div className="space-y-3">
+              <a href="mailto:contact@gradeflow.edu" className="flex items-center gap-3 text-sm text-slate-400 hover:text-white transition-colors">
+                <Mail size={16} />
+                contact@gradeflow.edu
+              </a>
+              <a href="tel:+15550123456" className="flex items-center gap-3 text-sm text-slate-400 hover:text-white transition-colors">
+                <Phone size={16} />
+                +1 (555) 012-3456
+              </a>
+            </div>
           </div>
-          <div>
-            <h4 className="font-semibold mb-4">Product</h4>
-            <ul className="space-y-2 text-sm text-text-secondary">
-              <li>
-                <Link href="/#features" className="hover:text-text-primary transition-colors">
-                  Features
-                </Link>
-              </li>
-              <li>
-                <Link href="/#pricing" className="hover:text-text-primary transition-colors">
-                  Pricing
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-text-primary transition-colors">
-                  Integrations
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-text-primary transition-colors">
-                  Changelog
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-4">Company</h4>
-            <ul className="space-y-2 text-sm text-text-secondary">
-              <li>
-                <Link href="#" className="hover:text-text-primary transition-colors">
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-text-primary transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-text-primary transition-colors">
-                  Careers
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-text-primary transition-colors">
-                  Contact
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-4">Legal</h4>
-            <ul className="space-y-2 text-sm text-text-secondary">
-              <li>
-                <Link href="#" className="hover:text-text-primary transition-colors">
-                  Privacy
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-text-primary transition-colors">
-                  Terms
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-text-primary transition-colors">
-                  Security
-                </Link>
-              </li>
-            </ul>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 col-span-1 md:col-span-3 gap-8">
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-6">Platform</h4>
+              <ul className="space-y-4 text-sm text-slate-400">
+                <li><Link href="/guide" className="hover:text-white transition-colors">See How It Works</Link></li>
+                <li><Link href="/login" className="hover:text-white transition-colors">Start Learning</Link></li>
+                <li><Link href="/instructor/login" className="hover:text-white transition-colors">Admin Portal</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-6">Resources</h4>
+              <ul className="space-y-4 text-sm text-slate-400">
+                <li><Link href="#" className="hover:text-white transition-colors">Documentation</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">API Status</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-6">Connect</h4>
+              <div className="flex gap-4">
+                {[Twitter, Github, Linkedin].map((Icon, i) => (
+                  <a key={i} href="#" className="w-9 h-9 border border-slate-700 rounded flex items-center justify-center text-slate-400 hover:text-white hover:border-slate-500 transition-all">
+                    <Icon size={18} />
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-        <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-white/10">
-          <p className="text-sm text-text-secondary">
-            © 2024 GradeFlow. All rights reserved.
+
+        <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-xs">
+          <p>© {new Date().getFullYear()} GradeFlow Academic Systems. All rights reserved.</p>
+          <p className="flex gap-6">
+            <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
+            <Link href="#" className="hover:text-white transition-colors">Security</Link>
           </p>
-          <div className="flex items-center gap-4 mt-4 md:mt-0">
-             {/* Social icons omitted for brevity, adding placeholders */}
-            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer">
-                X
-            </div>
-             <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer">
-                In
-            </div>
-             <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer">
-                Fb
-            </div>
-          </div>
         </div>
       </div>
     </footer>

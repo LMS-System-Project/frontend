@@ -1,15 +1,17 @@
 import Hero from "@/components/home/Hero";
+import Lifecycle from "@/components/home/Lifecycle";
 import Features from "@/components/home/Features";
-import Pricing from "@/components/home/Pricing";
-import DashboardTabs from "@/components/home/DashboardTabs";
+import Reviews from "@/components/home/Reviews";
+import Footer from "@/components/layout/Footer";
 
 export default function Home() {
   return (
-    <>
+    <main className="min-h-screen bg-background text-primary-text">
       <Hero />
       <Features />
-      <DashboardTabs />
-      <Pricing />
-    </>
+      <Lifecycle />
+      <Reviews />
+      <Footer />
+    </main>
   );
 }

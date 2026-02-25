@@ -1,71 +1,246 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { GraduationCap, BookOpen, ShieldCheck } from "lucide-react";
+
+const ROLES = [
+  {
+    key: "student",
+    label: "Student",
+    icon: GraduationCap,
+    heroImg: "https://images.pexels.com/photos/5212317/pexels-photo-5212317.jpeg?auto=compress&cs=tinysrgb&w=900&h=600&fit=crop",
+    headline: "Your academic journey, intelligently guided.",
+    points: [
+      "Personalised CGPA trend charts and subject performance radar",
+      "AI career path recommendations aligned with your strengths",
+      "Smart assignment tracker with AI feedback before submission",
+    ],
+  },
+  {
+    key: "instructor",
+    label: "Teacher",
+    icon: BookOpen,
+    heroImg: "https://images.pexels.com/photos/4144101/pexels-photo-4144101.jpeg?auto=compress&cs=tinysrgb&w=900&h=600&fit=crop",
+    headline: "Grade smarter with AI-assisted tools.",
+    points: [
+      "AI grading with rubric alignment and confidence scores",
+      "Per-student performance insights and early risk flags",
+      "Course analytics with drop-off and engagement metrics",
+    ],
+  },
+  {
+    key: "admin",
+    label: "Admin",
+    icon: ShieldCheck,
+    heroImg: "https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=900&h=600&fit=crop",
+    headline: "University-wide intelligence at a glance.",
+    points: [
+      "Department GPA comparison and student at-risk heatmap",
+      "Batch export of reports in CSV, XLSX, or PDF",
+      "AI anomaly detection and academic fraud alerts",
+    ],
+  },
+];
 
 export default function DashboardTabs() {
-  const [activeTab, setActiveTab] = useState<"student" | "instructor" | "admin">("student");
+  const [active, setActive] = useState("student");
+  const [visible, setVisible] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const ref = useRef<HTMLElement>(null);
+
+  const current = ROLES.find((r) => r.key === active)!;
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+      { threshold: 0.1 }
+    );
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
+  useEffect(() => {
+    setImgLoaded(false);
+  }, [active]);
 
   return (
-    <section id="dashboards" className="py-24 relative hero-gradient">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <span className="inline-block px-4 py-2 rounded-full bg-purple-500/10 text-purple-400 text-sm font-medium mb-4">
-            Role-Based Dashboards
-          </span>
-          <h2 className="text-4xl lg:text-5xl font-bold mb-4">
-            Designed for <span className="gradient-text">Everyone</span>
+    <section
+      id="dashboards"
+      ref={ref}
+      style={{ background: "#F0ECE3", padding: "100px 24px" }}
+    >
+      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+
+        {/* Header */}
+        <div
+          style={{
+            textAlign: "center",
+            marginBottom: "56px",
+            opacity: visible ? 1 : 0,
+            transform: visible ? "none" : "translateY(24px)",
+            transition: "all 0.8s ease",
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: "var(--font-serif), 'Playfair Display', Georgia, serif",
+              fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)",
+              fontWeight: 700,
+              color: "#111",
+              letterSpacing: "-0.02em",
+              margin: "0 0 16px",
+            }}
+          >
+            Proven Results, Real Impact
           </h2>
-          <p className="text-xl text-text-secondary max-w-2xl mx-auto">
-            Tailored experiences for students, instructors, and administrators.
+          <p style={{ fontSize: "15px", color: "#888", lineHeight: 1.7, maxWidth: "420px", margin: "0 auto" }}>
+            See how institutions are working faster, collaborating better, and getting more done with GradeFlow.
           </p>
         </div>
 
-        {/* Tabs */}
-        <div className="flex justify-center gap-4 mb-12 flex-wrap">
-          {(["student", "instructor", "admin"] as const).map((role) => (
-            <button
-              key={role}
-              onClick={() => setActiveTab(role)}
-              className={`px-6 py-3 rounded-xl font-medium transition-all capitalize ${
-                activeTab === role
-                  ? "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30"
-                  : "text-text-secondary hover:bg-white/5"
-              }`}
-            >
-              {role === "student" && "🎒 "}
-              {role === "instructor" && "👨‍🏫 "}
-              {role === "admin" && "🛠️ "}
-              {role}
-            </button>
-          ))}
+        {/* Tab Switcher */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "8px",
+            marginBottom: "48px",
+            flexWrap: "wrap",
+            opacity: visible ? 1 : 0,
+            transition: "opacity 0.8s ease 0.15s",
+          }}
+        >
+          {ROLES.map((role) => {
+            const Icon = role.icon;
+            const isActive = active === role.key;
+            return (
+              <button
+                key={role.key}
+                onClick={() => setActive(role.key)}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "10px 22px",
+                  borderRadius: "100px",
+                  border: "1.5px solid",
+                  borderColor: isActive ? "#111" : "rgba(0,0,0,0.15)",
+                  background: isActive ? "#111" : "transparent",
+                  color: isActive ? "#fff" : "#555",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                }}
+              >
+                <Icon size={15} />
+                {role.label}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Preview Content */}
-        <div className="dashboard-panel min-h-[400px]">
-          <div className="gradient-border p-8 bg-background-card">
-            <div className="text-center space-y-6 py-12">
-              <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-4xl">
-                 {activeTab === "student" && "🎒"}
-                 {activeTab === "instructor" && "👨‍🏫"}
-                 {activeTab === "admin" && "🛠️"}
-              </div>
-              <h3 className="text-2xl font-bold capitalize">{activeTab} Dashboard</h3>
-              <p className="text-text-secondary max-w-md mx-auto">
-                Access your personalized {activeTab} tools, tracking, and insights.
-                This is a preview of the full dashboard experience.
-              </p>
-              
-              <Link 
-                href={`/${activeTab}/dashboard`}
-                className="inline-flex items-center gap-2 btn-primary px-6 py-3 rounded-xl font-semibold text-white"
-              >
-                Launch {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Dashboard
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </div>
+        {/* Content */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "48px",
+            alignItems: "center",
+            opacity: visible ? 1 : 0,
+            transition: "opacity 0.5s ease 0.2s",
+          }}
+          className="dashboard-grid"
+        >
+          {/* Left: photo */}
+          <div
+            style={{
+              borderRadius: "20px",
+              overflow: "hidden",
+              aspectRatio: "4/3",
+              position: "relative",
+              background: "#C8C0B4",
+            }}
+          >
+            <img
+              key={current.key}
+              src={current.heroImg}
+              alt={current.label}
+              onLoad={() => setImgLoaded(true)}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                opacity: imgLoaded ? 1 : 0,
+                transition: "opacity 0.5s ease",
+              }}
+            />
           </div>
+
+          {/* Right: text */}
+          <div>
+            <h3
+              style={{
+                fontFamily: "var(--font-serif), 'Playfair Display', Georgia, serif",
+                fontSize: "clamp(1.5rem, 2.5vw, 2.2rem)",
+                fontWeight: 700,
+                color: "#111",
+                letterSpacing: "-0.02em",
+                margin: "0 0 28px",
+                lineHeight: 1.2,
+              }}
+            >
+              {current.headline}
+            </h3>
+
+            <ul style={{ listStyle: "none", padding: 0, margin: "0 0 40px", display: "flex", flexDirection: "column", gap: "18px" }}>
+              {current.points.map((point, i) => (
+                <li key={i} style={{ display: "flex", gap: "14px", alignItems: "flex-start" }}>
+                  <div
+                    style={{
+                      width: "22px",
+                      height: "22px",
+                      borderRadius: "50%",
+                      background: "#111",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                      marginTop: "1px",
+                    }}
+                  >
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                      <path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                  <span style={{ fontSize: "14px", color: "#555", lineHeight: 1.6 }}>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Social proof photos strip */}
+        <div
+          style={{
+            marginTop: "80px",
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: "16px",
+            opacity: visible ? 1 : 0,
+            transition: "opacity 0.8s ease 0.4s",
+          }}
+          className="proof-grid"
+        >
+          {[
+            "https://images.pexels.com/photos/1181534/pexels-photo-1181534.jpeg?auto=compress&cs=tinysrgb&w=700&h=450&fit=crop",
+            "https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=700&h=450&fit=crop",
+            "https://images.pexels.com/photos/1462630/pexels-photo-1462630.jpeg?auto=compress&cs=tinysrgb&w=700&h=450&fit=crop",
+          ].map((src, i) => (
+            <div key={i} style={{ borderRadius: "16px", overflow: "hidden", aspectRatio: "3/2" }}>
+              <img src={src} alt="Campus life" style={{ width: "100%", height: "100%", objectFit: "cover" }} loading="lazy" />
+            </div>
+          ))}
         </div>
       </div>
     </section>

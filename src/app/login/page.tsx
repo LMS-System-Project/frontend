@@ -3,155 +3,223 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Mail, Lock, User, Github, Loader2 } from "lucide-react";
+import { Mail, Lock, ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
+import AuthLayout from "@/components/auth/AuthLayout";
 import { api } from "@/services/api";
 
 export default function LoginPage() {
-    const [isRegister, setIsRegister] = useState(false);
+    const router = useRouter();
+    const [roleMode, setRoleMode] = useState<"student" | "teacher" | "admin">("student");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [fullName, setFullName] = useState("");
-    const [role, setRole] = useState("instructor");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError("");
         setLoading(true);
-        try {
-            if (isRegister) {
-                await api.auth.register({ email, password, full_name: fullName, role });
-            } else {
-                await api.auth.login({ email, password });
+        setError("");
+
+        const normalizedEmail = email.trim().toLowerCase();
+        console.log("DEBUG: Login Attempt", {
+            roleSelected: roleMode,
+            emailEntered: normalizedEmail,
+            passwordEntered: password.trim(),
+            expectedEmail: "admin@gradeflow.com",
+            expectedPass: "admin123"
+        });
+
+        // --- HYPER-ROBUST LOCAL BYPASS FOR ADMIN ---
+        // Catch admin credentials REGARDLESS of the tab selected
+        if (normalizedEmail === "admin@gradeflow.com" && password.trim() === "admin123") {
+            console.log("MATCH: Master Admin detected. Bypassing backend...");
+            const targetPath = "/admin/dashboard";
+
+            if (typeof window !== "undefined") {
+                localStorage.setItem("gradeflow_token", "local-admin-bypass-token");
+                localStorage.setItem("gradeflow_user", JSON.stringify({
+                    role: "admin",
+                    email: "admin@gradeflow.com",
+                    full_name: "Sneha Varghese",
+                    id: "local-admin-id"
+                }));
             }
-            const user = api.auth.getUser();
-            if (user?.role === "instructor") router.push("/instructor/dashboard");
-            else if (user?.role === "student") router.push("/student/dashboard");
-            else if (user?.role === "admin") router.push("/admin/dashboard");
-            else router.push("/instructor/dashboard");
+
+            console.log("Login: State set, redirecting...");
+            router.push(targetPath);
+
+            setTimeout(() => {
+                if (window.location.pathname !== targetPath) {
+                    console.log("Login: Forcing location update.");
+                    window.location.href = targetPath;
+                }
+            }, 800);
+
+            setLoading(false);
+            return;
+        }
+        // --------------------------------------------
+
+        try {
+            console.log("Login: Proceeding to backend authentication...");
+            const data = await api.auth.login({ email: normalizedEmail, password });
+            console.log("Login: Backend success, data returned:", data);
+
+            // Redirection logic based on role from backend or selection
+            const userRole = data.role || data.user?.role || roleMode;
+            let targetPath = "/student/dashboard";
+
+            if (userRole === "instructor" || userRole === "teacher") {
+                targetPath = "/instructor/dashboard";
+            } else if (userRole === "admin") {
+                targetPath = "/admin/dashboard";
+            }
+
+            console.log("Login: Redirecting to", targetPath);
+
+            // Primary Next.js navigation
+            router.push(targetPath);
+
+            // Secondary fallback if router hangs
+            setTimeout(() => {
+                if (window.location.pathname !== targetPath) {
+                    console.log("Login: Push took too long, forcing location update.");
+                    window.location.href = targetPath;
+                }
+            }, 1500);
+
         } catch (err: any) {
-            setError(err.message || "Something went wrong");
+            console.error("Login: Error", err);
+            setError(err.message || "Invalid credentials. Please try again.");
         } finally {
             setLoading(false);
         }
     };
 
+    const getRoleConfig = () => {
+        switch (roleMode) {
+            case "admin":
+                return {
+                    title: "Admin Console",
+                    subtitle: "Institutional oversight and system control",
+                    button: "Admin Sign In"
+                };
+            case "teacher":
+                return {
+                    title: "Faculty Portal",
+                    subtitle: "Manage courses, grading, and student progress",
+                    button: "Teacher Sign In"
+                };
+            default:
+                return {
+                    title: "Student Portal",
+                    subtitle: "Access your learning journey and academic records",
+                    button: "Student Sign In"
+                };
+        }
+    };
+
+    const config = getRoleConfig();
+
     return (
-        <div className="min-h-screen pt-20 pb-12 flex items-center justify-center relative overflow-hidden">
-            {/* Background accents */}
-            <div className="absolute top-20 left-10 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl animate-float" />
-            <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-float-delay" />
+        <AuthLayout
+            title={config.title}
+            subtitle={config.subtitle}
+        >
+            <div className="flex bg-slate-100 p-1 rounded-lg mb-8">
+                {(["student", "teacher", "admin"] as const).map((mode) => (
+                    <button
+                        key={mode}
+                        type="button"
+                        onClick={() => setRoleMode(mode)}
+                        className={`flex-1 py-2 text-[10px] font-black uppercase tracking-wider rounded-md transition-all ${roleMode === mode
+                            ? "bg-white text-slate-900 shadow-sm"
+                            : "text-slate-500 hover:text-slate-700"
+                            }`}
+                    >
+                        {mode}
+                    </button>
+                ))}
+            </div>
 
-            <div className="w-full max-w-md mx-4 relative z-10">
-                <div className="glass-card p-8 relative" style={{ background: "var(--bg-card)" }}>
-                    <Link href="/" className="absolute top-4 right-4 p-2 rounded-lg hover:bg-[var(--hover-bg)] transition-colors" style={{ color: "var(--text-secondary)" }}>
-                        <ArrowLeft className="w-5 h-5" />
-                    </Link>
-
-                    <div className="text-center mb-8">
-                        <div className="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center mx-auto mb-4">
-                            <span className="text-lg font-bold text-white">GF</span>
+            <form onSubmit={handleSubmit} className="space-y-6">
+                {error && (
+                    <div className="p-3 bg-red-50 border border-red-100 rounded-md text-red-600 text-xs font-bold animate-in fade-in slide-in-from-top-1">
+                        {error}
+                    </div>
+                )}
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" htmlFor="email">
+                            Email Address
+                        </label>
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                <Mail size={18} />
+                            </div>
+                            <input
+                                id="email"
+                                type="email"
+                                required
+                                className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-md bg-white text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent transition-all"
+                                placeholder="name@university.edu"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
                         </div>
-                        <h2 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-                            {isRegister ? "Create an Account" : "Welcome Back"}
-                        </h2>
-                        <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
-                            {isRegister ? "Join thousands of learners today" : "Sign in to continue your progress"}
-                        </p>
                     </div>
 
-                    {error && (
-                        <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 text-sm">
-                            {error}
+                    <div>
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider" htmlFor="password">
+                                Password
+                            </label>
+                            <Link href="#" className="text-xs font-medium text-slate-500 hover:text-accent transition-colors">
+                                Forgot password?
+                            </Link>
                         </div>
-                    )}
-
-                    <form className="space-y-4" onSubmit={handleSubmit}>
-                        {isRegister && (
-                            <>
-                                <div className="space-y-1.5">
-                                    <label className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>Full Name</label>
-                                    <div className="relative">
-                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "var(--text-secondary)" }} />
-                                        <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)}
-                                            className="input-field pl-10" placeholder="John Doe" required />
-                                    </div>
-                                </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>Role</label>
-                                    <select value={role} onChange={(e) => setRole(e.target.value)} className="input-field">
-                                        <option value="instructor">Instructor</option>
-                                        <option value="student">Student</option>
-                                    </select>
-                                </div>
-                            </>
-                        )}
-
-                        <div className="space-y-1.5">
-                            <label className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>Email</label>
-                            <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "var(--text-secondary)" }} />
-                                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                                    className="input-field pl-10" placeholder="you@example.com" required />
-                            </div>
-                        </div>
-
-                        <div className="space-y-1.5">
-                            <label className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>Password</label>
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "var(--text-secondary)" }} />
-                                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-                                    className="input-field pl-10" placeholder="••••••••" required />
-                            </div>
-                        </div>
-
-                        {!isRegister && (
-                            <div className="flex justify-end">
-                                <a href="#" className="text-xs font-medium" style={{ color: "var(--accent)" }}>Forgot password?</a>
-                            </div>
-                        )}
-
-                        <button type="submit" disabled={loading}
-                            className="w-full btn-primary py-3 rounded-xl font-semibold text-white mt-2 flex items-center justify-center gap-2 disabled:opacity-50">
-                            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                            {isRegister ? "Sign Up" : "Sign In"}
-                        </button>
-                    </form>
-
-                    <div className="mt-8 text-center space-y-4">
                         <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full" style={{ borderTop: "1px solid var(--border-color)" }} />
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                <Lock size={18} />
                             </div>
-                            <div className="relative flex justify-center text-sm">
-                                <span className="px-2" style={{ background: "var(--bg-card)", color: "var(--text-secondary)" }}>Or continue with</span>
-                            </div>
+                            <input
+                                id="password"
+                                type="password"
+                                required
+                                className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-md bg-white text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent transition-all"
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
                         </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <button className="flex items-center justify-center gap-2 py-2.5 rounded-xl transition-colors"
-                                style={{ border: "1px solid var(--border-color)", color: "var(--text-primary)" }}>
-                                <Github className="w-5 h-5" />
-                                <span className="text-sm font-medium">GitHub</span>
-                            </button>
-                            <button className="flex items-center justify-center gap-2 py-2.5 rounded-xl transition-colors"
-                                style={{ border: "1px solid var(--border-color)", color: "var(--text-primary)" }}>
-                                <span className="text-lg font-bold">G</span>
-                                <span className="text-sm font-medium">Google</span>
-                            </button>
-                        </div>
-
-                        <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                            {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
-                            <button onClick={() => { setIsRegister(!isRegister); setError(""); }} className="font-medium" style={{ color: "var(--accent)" }}>
-                                {isRegister ? "Sign In" : "Sign Up"}
-                            </button>
-                        </p>
                     </div>
                 </div>
-            </div>
-        </div>
+
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full flex items-center justify-center gap-2 bg-accent text-white py-3 rounded-md font-bold hover:bg-slate-800 transition-all shadow-sm border border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {loading ? (
+                        <>
+                            <Loader2 size={18} className="animate-spin" />
+                            Establishing Identity...
+                        </>
+                    ) : (
+                        <>
+                            {config.button}
+                            <ArrowRight size={18} />
+                        </>
+                    )}
+                </button>
+
+                <p className="text-center text-sm text-slate-600">
+                    Don't have an account?{" "}
+                    <Link href="/register" className="font-bold text-accent hover:underline">
+                        Create one
+                    </Link>
+                </p>
+            </form>
+        </AuthLayout>
     );
 }
