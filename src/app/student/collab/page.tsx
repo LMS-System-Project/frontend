@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import DashboardShell from "@/components/dashboard/DashboardShell";
 import {
     Users,
     Sparkles,
@@ -44,18 +43,17 @@ export default function CollaborationHubPage() {
     const [activeTab, setActiveTab] = useState<"discovery" | "my-groups">("discovery");
 
     return (
-        <DashboardShell role="student">
-            <div className="space-y-8 max-w-[1200px] mx-auto pb-20">
-                {/* Institutional Header */}
+        <div className="space-y-8 max-w-[1200px] mx-auto pb-20">
+                {/* Page Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
                         <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
                             <Users size={14} className="text-accent" />
-                            <span>Academic Synthesis • Peer Governance</span>
+                            <span>Collaboration • Study Groups</span>
                         </div>
                         <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">Collaboration Hub</h1>
                         <p className="text-sm text-slate-500 mt-1">
-                            Deploying <span className="text-accent font-bold italic">Neural Pairing</span> to eliminate institutional knowledge gaps.
+                            Find and join <span className="text-accent font-bold italic">study groups</span> matched to your courses and learning goals.
                         </p>
                     </div>
 
@@ -65,14 +63,14 @@ export default function CollaborationHubPage() {
                             className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === "discovery" ? "bg-white text-accent shadow-sm" : "text-slate-400"
                                 }`}
                         >
-                            Mesh Discovery
+                            Browse Groups
                         </button>
                         <button
                             onClick={() => setActiveTab("my-groups")}
                             className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === "my-groups" ? "bg-white text-accent shadow-sm" : "text-slate-400"
                                 }`}
                         >
-                            Active Clusters
+                            My Groups
                         </button>
                     </div>
                 </div>
@@ -86,13 +84,13 @@ export default function CollaborationHubPage() {
                                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-accent transition-colors" size={18} />
                                 <input
                                     type="text"
-                                    placeholder="Scan for specialized study clusters..."
+                                    placeholder="Search for study groups..."
                                     className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-1 focus:ring-accent transition-all shadow-sm italic"
                                 />
                             </div>
                             <button className="w-full sm:w-auto px-6 py-3 bg-white border border-slate-200 rounded-2xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:border-accent hover:text-accent transition-all flex items-center justify-center gap-2 shadow-sm">
                                 <Filter size={16} />
-                                Refine Matrix
+                                Filter
                             </button>
                         </div>
 
@@ -104,30 +102,30 @@ export default function CollaborationHubPage() {
                             <div className="relative z-10">
                                 <div className="flex items-center gap-2 text-accent mb-6">
                                     <Brain size={20} />
-                                    <span className="text-[10px] font-black uppercase tracking-[0.4em]">Neural Matching Active</span>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.4em]">Smart Matching Active</span>
                                 </div>
                                 <h2 className="text-2xl font-bold tracking-tight italic mb-6 leading-tight">
                                     We found a <span className="text-white italic underline decoration-accent/30 lowercase">98% match</span> for your Calculus skill-gap.
                                 </h2>
                                 <p className="text-sm text-slate-400 max-w-xl font-medium italic mb-10 leading-relaxed">
-                                    Alex Kim and 2 others are currently synthesizing the next lecture. Their high proficiency in <span className="text-white">Applied Integration</span> complements your strength in <span className="text-white">Theoretic Proofs</span>.
+                                    Alex Kim and 2 others are currently studying the next lecture. Their high proficiency in <span className="text-white">Applied Integration</span> complements your strength in <span className="text-white">Theoretic Proofs</span>.
                                 </p>
                                 <div className="flex items-center gap-4">
                                     <button className="px-8 py-4 bg-accent text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] shadow-xl border border-slate-700 hover:bg-slate-800 transition-all flex items-center gap-2">
-                                        Initiate Sync
+                                        Join Group
                                         <Zap size={16} />
                                     </button>
-                                    <button className="px-8 py-4 bg-white/5 text-white/60 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-white/10 hover:bg-white/10 hover:text-white transition-all">Dismiss Vector</button>
+                                    <button className="px-8 py-4 bg-white/5 text-white/60 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-white/10 hover:bg-white/10 hover:text-white transition-all">Dismiss</button>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Cluster Registry */}
+                        {/* Available Groups */}
                         <div className="space-y-6">
                             <div className="flex items-center justify-between px-2">
                                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                     <Hash size={14} className="text-accent" />
-                                    Institutional Cluster Registry
+                                    Available Study Groups
                                 </h3>
                                 <span className="text-[9px] font-bold text-slate-300 uppercase italic">Updated 12m ago</span>
                             </div>
@@ -179,7 +177,7 @@ export default function CollaborationHubPage() {
                                     <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                         <Plus size={24} />
                                     </div>
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em]">Deploy New Cluster</p>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em]">Create New Group</p>
                                 </button>
                             </div>
                         </div>
@@ -195,7 +193,7 @@ export default function CollaborationHubPage() {
                                     <Zap size={14} />
                                 </div>
                             </div>
-                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2">Synthesis Master</h4>
+                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2">Active Collaborator</h4>
                             <p className="text-xl font-black text-primary-text italic tracking-tighter mb-4 underline decoration-amber-200 uppercase">Tier II Collaborator</p>
                             <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden shadow-inner mb-2">
                                 <div className="h-full bg-amber-400 w-[64%] shadow-[0_0_8px_rgba(251,191,36,0.5)]" />
@@ -207,7 +205,7 @@ export default function CollaborationHubPage() {
                         <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm border-b-4 border-b-slate-100">
                             <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
                                 <MessageSquare size={14} className="text-accent" />
-                                Direct Synthesis Directives
+                                Direct Messages
                             </h4>
                             <div className="space-y-6">
                                 {[
@@ -243,7 +241,7 @@ export default function CollaborationHubPage() {
                             </div>
                             <h4 className="text-[10px] font-black text-white/60 uppercase tracking-widest mb-10 flex items-center gap-2">
                                 <Target size={14} />
-                                Reputation Quotient
+                                Peer Rating
                             </h4>
                             <div className="flex items-end justify-between mb-8">
                                 <div>
@@ -257,12 +255,11 @@ export default function CollaborationHubPage() {
                                 </div>
                             </div>
                             <p className="text-[10px] text-white/70 italic leading-relaxed font-medium">
-                                Your peer-rated synthesis quality is in the <span className="text-white font-bold">Top 2%</span> of the institutional registry.
+                                Your peer-rated collaboration quality is in the <span className="text-white font-bold">Top 2%</span> of the platform.
                             </p>
                         </div>
                     </div>
                 </div>
-            </div>
-        </DashboardShell>
+        </div>
     );
 }

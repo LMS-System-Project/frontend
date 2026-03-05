@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import DashboardShell from "@/components/dashboard/DashboardShell";
 import {
     Calendar,
     Clock,
@@ -39,23 +38,22 @@ export default function SmartPlannerPage() {
 
     const events: Event[] = [
         { id: "1", title: "CS 301: Final Submission", type: "assignment", start: "09:00", end: "10:00", priority: "high" },
-        { id: "2", title: "AI Deep Work: Neural Nets", type: "deep-work", start: "11:00", end: "13:30", priority: "medium" },
+        { id: "2", title: "AI Deep Work: Machine Learning", type: "deep-work", start: "11:00", end: "13:30", priority: "medium" },
         { id: "3", title: "MA 201: Calculus Lecture", type: "lecture", start: "14:00", end: "15:30", priority: "low" },
     ];
 
     return (
-        <DashboardShell role="student">
-            <div className="space-y-8 max-w-[1200px] mx-auto pb-20">
-                {/* Tactical Header */}
+        <div className="space-y-8 max-w-[1200px] mx-auto pb-20">
+                {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
                         <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
                             <Calendar size={14} className="text-accent" />
-                            <span>Academic Velocity • Temporal Governance</span>
+                            <span>Schedule • Weekly Planner</span>
                         </div>
-                        <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">Smart Planner</h1>
+                        <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">Study Planner</h1>
                         <p className="text-sm text-slate-500 mt-1">
-                            Synchronizing <span className="text-accent font-bold italic">Deep Work Vectors</span> with institutional assessment lifecycles.
+                            Plan your <span className="text-accent font-bold italic">study sessions</span> and track upcoming deadlines.
                         </p>
                     </div>
 
@@ -65,14 +63,14 @@ export default function SmartPlannerPage() {
                             className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${view === "calendar" ? "bg-white text-accent shadow-sm" : "text-slate-400"
                                 }`}
                         >
-                            Mesh View
+                            Calendar
                         </button>
                         <button
                             onClick={() => setView("timeline")}
                             className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${view === "timeline" ? "bg-white text-accent shadow-sm" : "text-slate-400"
                                 }`}
                         >
-                            Linear Flow
+                            Timeline
                         </button>
                     </div>
                 </div>
@@ -80,7 +78,7 @@ export default function SmartPlannerPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     {/* Main Interaction Area */}
                     <div className="lg:col-span-8 space-y-8">
-                        {/* Weekly Mesh */}
+                        {/* Weekly Calendar */}
                         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm border-b-4 border-b-slate-100">
                             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                                 <div className="flex items-center gap-4">
@@ -94,7 +92,7 @@ export default function SmartPlannerPage() {
                                 </div>
                                 <button className="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg border border-slate-800 hover:bg-black transition-all flex items-center gap-2">
                                     <Plus size={14} />
-                                    New Vector
+                                    New Event
                                 </button>
                             </div>
 
@@ -146,7 +144,7 @@ export default function SmartPlannerPage() {
                                                     <span className="text-[8px] font-black uppercase tracking-widest">AI Suggestion</span>
                                                 </div>
                                                 <p className="text-[10px] font-bold text-slate-400 italic">Recommended: 2H Focus Block</p>
-                                                <button className="mt-3 w-full py-1.5 bg-accent/10 text-accent rounded-lg text-[8px] font-black uppercase tracking-widest border border-accent/20 opacity-0 group-hover/ghost:opacity-100 transition-opacity">Lock Flow</button>
+                                                <button className="mt-3 w-full py-1.5 bg-accent/10 text-accent rounded-lg text-[8px] font-black uppercase tracking-widest border border-accent/20 opacity-0 group-hover/ghost:opacity-100 transition-opacity">Add to Schedule</button>
                                             </div>
                                         )}
                                     </div>
@@ -161,13 +159,13 @@ export default function SmartPlannerPage() {
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-2 text-accent mb-6">
                                         <Brain size={18} />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">Cognitive Advisor</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest">Smart Suggestions</span>
                                     </div>
-                                    <h4 className="text-xl font-bold tracking-tight italic mb-4 underline decoration-accent/30 lowercase italic">Avoid the midnight oil.</h4>
+                                    <h4 className="text-xl font-bold tracking-tight italic mb-4 underline decoration-accent/30 lowercase">Avoid the midnight oil.</h4>
                                     <p className="text-xs text-slate-400 leading-relaxed font-medium italic">
-                                        Your <span className="text-white font-bold">Inference Matrix</span> suggests a high cognitive load for Friday. I've rescheduled your non-critical tasks to Saturday Morning.
+                                        Based on <span className="text-white font-bold">our analysis</span>, you have a high workload on Friday. We've suggested moving non-critical tasks to Saturday morning.
                                     </p>
-                                    <button className="mt-8 px-6 py-3 bg-accent text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl border border-slate-700 hover:bg-slate-800 transition-all">Accept Optimization</button>
+                                    <button className="mt-8 px-6 py-3 bg-accent text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl border border-slate-700 hover:bg-slate-800 transition-all">Apply Changes</button>
                                 </div>
                             </div>
 
@@ -177,19 +175,19 @@ export default function SmartPlannerPage() {
                                 </div>
                                 <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
                                     <Target size={14} className="text-accent" />
-                                    Sync Calibration
+                                    Schedule Overview
                                 </h4>
                                 <div className="space-y-6">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Module Adherence</span>
+                                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Task Completion</span>
                                         <span className="text-xs font-black text-accent italic">98%</span>
                                     </div>
                                     <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden shadow-inner border border-slate-100">
                                         <div className="h-full bg-accent shadow-[0_0_8px_rgba(27,51,84,0.3)] transition-all duration-1000" style={{ width: '98%' }} />
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Temporal Drift</span>
-                                        <span className="text-xs font-black text-emerald-500 italic">-4.2m Nominal</span>
+                                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Schedule Variance</span>
+                                        <span className="text-xs font-black text-emerald-500 italic">-4.2 min ahead</span>
                                     </div>
                                 </div>
                             </div>
@@ -202,7 +200,7 @@ export default function SmartPlannerPage() {
                         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm border-b-4 border-b-slate-100">
                             <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
                                 <Activity size={14} className="text-red-500" />
-                                Procrastination Index
+                                Procrastination Score
                             </h4>
 
                             <div className="flex flex-col items-center py-4">
@@ -223,10 +221,10 @@ export default function SmartPlannerPage() {
                                     </svg>
                                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                                         <span className="text-2xl font-black text-primary-text italic">14%</span>
-                                        <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Nominal</span>
+                                        <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">On Track</span>
                                     </div>
                                 </div>
-                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-8 text-center italic">Elite Compliance Matrix Identified</p>
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-8 text-center italic">Great job staying on track!</p>
                             </div>
                         </div>
 
@@ -234,8 +232,8 @@ export default function SmartPlannerPage() {
                         <div className="space-y-4">
                             {[
                                 { label: 'Optimal Focus', sub: '9AM - 1PM', icon: Smile, col: 'accent' },
-                                { label: 'Cognitive Decay', sub: '4PM - 6PM', icon: Coffee, col: 'amber-500' },
-                                { label: 'Recovery State', sub: '11PM - 7AM', icon: Moon, col: 'indigo-500' },
+                                { label: 'Low Energy', sub: '4PM - 6PM', icon: Coffee, col: 'amber-500' },
+                                { label: 'Rest Period', sub: '11PM - 7AM', icon: Moon, col: 'indigo-500' },
                             ].map((state, i) => (
                                 <div key={i} className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm flex items-center justify-between border-b-4 border-b-slate-100 group hover:border-b-accent transition-all">
                                     <div className="flex items-center gap-4">
@@ -252,22 +250,21 @@ export default function SmartPlannerPage() {
                             ))}
                         </div>
 
-                        {/* Lockdown Hub */}
+                        {/* Focus Mode */}
                         <div className="bg-red-50 border border-red-100 rounded-2xl p-6 group">
                             <h4 className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-4 flex items-center gap-2">
                                 <Lock size={14} />
-                                Executive Focus
+                                Focus Mode
                             </h4>
                             <p className="text-[10px] text-red-800 font-medium leading-relaxed italic mb-6">
-                                Enable <span className="font-bold underline decoration-red-200">Total System Lockdown</span> to isolate academic vectors and eliminate digital noise.
+                                Enable <span className="font-bold underline decoration-red-200">Focus Mode</span> to block distractions and concentrate on your studies.
                             </p>
                             <button className="w-full py-3 bg-red-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg border border-red-700 hover:bg-red-700 transition-all">
-                                Initiate Lockdown
+                                Start Focus Mode
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
-        </DashboardShell>
+        </div>
     );
 }

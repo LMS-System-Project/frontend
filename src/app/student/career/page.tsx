@@ -80,16 +80,16 @@ export default function StudentCareerPage() {
                 <div>
                     <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
                         <Compass size={14} className="text-accent" />
-                        <span>Professional Placement • Intelligence Hub</span>
+                        <span>Career Services • Job Matching</span>
                     </div>
                     <h1 className="text-3xl font-bold text-primary-text tracking-tight">Career Placement & Market Insight</h1>
                     <p className="text-sm text-slate-500 mt-1">
-                        Algorithmic matching between your academic competency and enterprise requirements.
+                        AI-powered matching between your academic profile and industry requirements.
                     </p>
                 </div>
                 <div className="flex gap-2">
                     <button className="px-4 py-2 border border-slate-200 rounded-md text-xs font-bold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-2">
-                        Institutional CV
+                        My Resume
                         <ChevronRight size={14} />
                     </button>
                     <button className="px-4 py-2 bg-accent text-white rounded-md text-xs font-bold shadow-sm border border-slate-700 hover:bg-slate-800 transition-all">
@@ -103,7 +103,7 @@ export default function StudentCareerPage() {
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                         <Target size={14} />
-                        Elite Opportunity Matches
+                        Top Career Matches
                     </h2>
                     <span className="text-[10px] font-bold text-slate-400">UPDATED 1H AGO</span>
                 </div>
@@ -117,7 +117,7 @@ export default function StudentCareerPage() {
                                     </div>
                                     <div className="flex flex-col items-end">
                                         <span className={`text-2xl font-black ${path.color} tracking-tight`}>{path.match}%</span>
-                                        <span className="text-[10px] font-bold text-slate-400 tracking-tighter uppercase">Match Pulse</span>
+                                        <span className="text-[10px] font-bold text-slate-400 tracking-tighter uppercase">Match Score</span>
                                     </div>
                                 </div>
                                 <h3 className="text-base font-bold text-primary-text mb-1 tracking-tight group-hover:text-accent transition-colors">{path.title}</h3>
@@ -130,7 +130,7 @@ export default function StudentCareerPage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Primary Hiring Nodes</div>
+                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Top Hiring Companies</div>
                                     <div className="flex flex-wrap gap-2">
                                         {path.companies.map((c, k) => (
                                             <div key={k} className="flex items-center gap-1.5 text-xs font-bold text-slate-700">
@@ -144,7 +144,7 @@ export default function StudentCareerPage() {
                             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Entry Level • Tier 1</span>
                                 <button className="text-xs font-bold text-accent flex items-center gap-1 hover:gap-2 transition-all">
-                                    Strategic Depth
+                                    View Details
                                     <ArrowRight size={14} />
                                 </button>
                             </div>
@@ -158,7 +158,7 @@ export default function StudentCareerPage() {
                 {/* Skill Gap Analysis */}
                 <div className="bg-white border border-slate-200 rounded-xl p-8 shadow-sm">
                     <div className="mb-8">
-                        <h3 className="text-lg font-bold text-primary-text tracking-tight text-center lg:text-left">Skill Gap Matrix</h3>
+                        <h3 className="text-lg font-bold text-primary-text tracking-tight text-center lg:text-left">Skills Analysis</h3>
                         <p className="text-xs text-slate-500 italic text-center lg:text-left">Benchmarking against AI Infrastructure Engineer (94% Match)</p>
                     </div>
                     <div className="h-72">
@@ -182,7 +182,7 @@ export default function StudentCareerPage() {
                     </div>
                     <div className="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-100">
                         <p className="text-[10px] text-slate-500 leading-relaxed text-center font-bold">
-                            <span className="text-accent">AI INSIGHT:</span> YOU ARE <span className="text-emerald-600">35% ABOVE COHORT AVG</span> IN PYTHON LOGIC. PRIMARY GROWTH AREA: <span className="text-red-500 underline decoration-slate-200">DEVOPS & CLOUD ARCHITECTURE</span>.
+                            <span className="text-accent">AI INSIGHT:</span> YOU ARE <span className="text-emerald-600">35% ABOVE CLASS AVG</span> IN PYTHON LOGIC. PRIMARY GROWTH AREA: <span className="text-red-500 underline decoration-slate-200">DEVOPS & CLOUD ARCHITECTURE</span>.
                         </p>
                     </div>
                 </div>
@@ -192,15 +192,15 @@ export default function StudentCareerPage() {
                     {/* Resume Engine */}
                     <div className="bg-white border border-slate-200 rounded-xl p-8 shadow-sm group">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-sm font-bold text-primary-text uppercase tracking-widest leading-none">CV Intelligence Engine</h3>
+                            <h3 className="text-sm font-bold text-primary-text uppercase tracking-widest leading-none">Resume Builder</h3>
                             <Zap size={18} className="text-accent" />
                         </div>
                         <div className="border-2 border-dashed border-slate-200 rounded-xl p-10 text-center hover:border-accent hover:bg-slate-50 transition-all cursor-pointer">
                             <div className="w-12 h-12 bg-slate-900 rounded-full mx-auto flex items-center justify-center text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
                                 <Upload size={24} />
                             </div>
-                            <p className="text-xs font-bold text-primary-text mb-1">EXECUTE RESUME SCAN</p>
-                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Synchronized with Institutional Template V2.4</p>
+                            <p className="text-xs font-bold text-primary-text mb-1">Upload Your Resume</p>
+                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Get AI-powered feedback and suggestions</p>
                         </div>
                     </div>
 
@@ -229,7 +229,7 @@ export default function StudentCareerPage() {
                         </div>
                         <div className="mt-8 pt-6 border-t border-slate-800 flex items-center justify-center">
                             <button className="text-[10px] font-bold text-slate-500 hover:text-white transition-colors tracking-widest flex items-center gap-2">
-                                VIEW ALL INSTITUTIONAL TRENDS
+                                VIEW ALL INDUSTRY TRENDS
                                 <ArrowUpRight size={14} />
                             </button>
                         </div>

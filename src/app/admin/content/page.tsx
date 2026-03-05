@@ -30,8 +30,8 @@ const contentItems = [
 ];
 
 const STATUS_THEMES: Record<string, { label: string; color: string; bg: string; icon: any }> = {
-    published: { label: "IN REPOSITORY", color: "text-emerald-600", bg: "bg-emerald-50", icon: ShieldCheck },
-    draft: { label: "STAGING DRAFT", color: "text-amber-600", bg: "bg-amber-50", icon: Activity },
+    published: { label: "PUBLISHED", color: "text-emerald-600", bg: "bg-emerald-50", icon: ShieldCheck },
+    draft: { label: "DRAFT", color: "text-amber-600", bg: "bg-amber-50", icon: Activity },
 };
 
 export default function AdminContentPage() {
@@ -47,16 +47,16 @@ export default function AdminContentPage() {
     return (
         <DashboardShell role="admin">
             <div className="space-y-8 max-w-[1200px] mx-auto pb-20">
-                {/* Governance Header */}
+                {/* Page Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
                         <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
                             <Lock size={14} className="text-accent" />
                             <span>Academic Audit • Content Repository</span>
                         </div>
-                        <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">Institutional Assets</h1>
+                        <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">Content Management</h1>
                         <p className="text-sm text-slate-500 mt-1">
-                            Governance of academic <span className="text-accent font-bold italic">Curriculum Artifacts</span> across your system.
+                            Manage academic <span className="text-accent font-bold italic">course materials</span> across your platform.
                         </p>
                     </div>
                     <div className="flex gap-4">
@@ -89,24 +89,24 @@ export default function AdminContentPage() {
                             <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 mb-4 border border-emerald-100 shadow-sm">
                                 <CheckCircle size={32} />
                             </div>
-                            <h3 className="text-base font-bold text-emerald-600 uppercase tracking-widest">Axiom Synchronized</h3>
-                            <p className="text-xs text-slate-400 mt-2 italic font-medium">Your instructional artifact has been committed to the institutional ledger.</p>
+                            <h3 className="text-base font-bold text-emerald-600 uppercase tracking-widest">Upload Complete</h3>
+                            <p className="text-xs text-slate-400 mt-2 italic font-medium">Your file has been uploaded to the content library.</p>
                         </div>
                     ) : (
                         <div className="max-w-xl mx-auto">
                             <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 mx-auto mb-6 group-hover:scale-110 group-hover:text-accent transition-all">
                                 <Upload size={32} />
                             </div>
-                            <h3 className="text-base font-bold text-primary-text uppercase tracking-widest">Ingest Academic Artifact</h3>
-                            <p className="text-xs text-slate-400 mt-2 mb-8 italic font-medium">Drag & drop modular lectures, research manuals, or evaluation schemas.</p>
+                            <h3 className="text-base font-bold text-primary-text uppercase tracking-widest">Upload Content</h3>
+                            <p className="text-xs text-slate-400 mt-2 mb-8 italic font-medium">Drag & drop lectures, manuals, or other course materials.</p>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-left">
                                 <div className="space-y-1.5 flex flex-col">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Artifact Code</label>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Content Code</label>
                                     <input type="text" placeholder="e.g. CS-301-L04" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-bold text-primary-text focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all italic shadow-inner" />
                                 </div>
                                 <div className="space-y-1.5 flex flex-col">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Modular Unit</label>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Course</label>
                                     <select className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-bold text-primary-text focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all appearance-none italic shadow-inner">
                                         <option>Select Course</option>
                                         <option>CS 301</option>
@@ -115,7 +115,7 @@ export default function AdminContentPage() {
                                     </select>
                                 </div>
                                 <div className="space-y-1.5 flex flex-col">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Department Registry</label>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Department</label>
                                     <select className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-bold text-primary-text focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all appearance-none italic shadow-inner">
                                         <option>Select Unit</option>
                                         <option>Computer Science</option>
@@ -127,13 +127,13 @@ export default function AdminContentPage() {
 
                             <button className="px-10 py-4 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl border border-slate-800 hover:bg-black transition-all flex items-center gap-2 mx-auto">
                                 <Cloud size={16} />
-                                Initiate Sequence
+                                Upload File
                             </button>
                         </div>
                     )}
                 </div>
 
-                {/* Registry Management */}
+                {/* Content Table */}
                 <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm border-b-4 border-b-slate-100">
                     <div className="p-6 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row gap-4 items-center">
                         <div className="relative flex-1 group w-full">
@@ -142,7 +142,7 @@ export default function AdminContentPage() {
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Scan repository for specific artifacts..."
+                                placeholder="Search content by title or course..."
                                 className="w-full pl-12 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-1 focus:ring-accent transition-all shadow-sm italic"
                             />
                         </div>
@@ -162,7 +162,7 @@ export default function AdminContentPage() {
                     <table className="w-full">
                         <thead>
                             <tr className="bg-slate-50/50">
-                                {["Format", "Artifact Title", "Course Unit", "Department", "Payload", "Timestamp", "Audit State", ""].map((h, i) => (
+                                {["Format", "Title", "Course", "Department", "Size", "Date", "Status", ""].map((h, i) => (
                                     <th key={i} className="text-left px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                                         {h}
                                     </th>
@@ -224,10 +224,10 @@ export default function AdminContentPage() {
                     <div className="px-8 py-6 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic">Institutional Core Ledger Synced (Last Audit: 12m ago)</span>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic">Content Library Synced (Last check: 12m ago)</span>
                         </div>
                         <button className="text-[10px] font-black text-accent uppercase tracking-widest flex items-center gap-2 hover:underline">
-                            Full System Audit
+                            View Full Library
                             <ArrowRight size={14} />
                         </button>
                     </div>

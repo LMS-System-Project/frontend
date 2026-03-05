@@ -41,7 +41,7 @@ export default function AssessmentGenerationPage() {
     const [generating, setGenerating] = useState(false);
     const [content, setContent] = useState("");
     const [assessmentType, setAssessmentType] = useState<"quiz" | "exam" | "rubric">("quiz");
-    const [difficulty, setDifficulty] = useState<"normal" | "rigorous" | "elite">("normal");
+    const [difficulty, setDifficulty] = useState<"normal" | "rigorous" | "advanced">("normal");
     const [questionCount, setQuestionCount] = useState(5);
     const [generatedQuestions, setGeneratedQuestions] = useState<Question[]>([]);
 
@@ -56,7 +56,7 @@ export default function AssessmentGenerationPage() {
             question: `Generated question ${i + 1} based on ${content.substring(0, 20)}...`,
             options: ["Option Alpha", "Option Beta", "Option Gamma", "Option Delta"],
             answer: "Option Alpha",
-            explanation: "The logic behind this generated question is derived from the core pedagogical vectors in your document."
+            explanation: "This question is derived from the core concepts in your source material."
         }));
 
         setGeneratedQuestions(mockQuestions);
@@ -65,18 +65,17 @@ export default function AssessmentGenerationPage() {
     }
 
     return (
-        <DashboardShell role="instructor">
-            <div className="space-y-8 max-w-[1200px] mx-auto pb-20">
+        <div className="space-y-8 max-w-[1200px] mx-auto pb-20">
                 {/* Module Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
                         <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
                             <Brain size={14} className="text-accent" />
-                            <span>Artificial Intelligence • Didactic Synthesis</span>
+                            <span>AI-Powered • Assessment Builder</span>
                         </div>
                         <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">Smart Assessment</h1>
                         <p className="text-sm text-slate-500 mt-1">
-                            Synthesize <span className="text-accent font-bold italic">High-Fidelity Evaluations</span> from raw instructional artifacts.
+                            Generate <span className="text-accent font-bold italic">high-quality assessments</span> from your course materials.
                         </p>
                     </div>
 
@@ -103,29 +102,29 @@ export default function AssessmentGenerationPage() {
                                         <FileUp size={24} />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold text-primary-text tracking-tight uppercase italic decoration-slate-100">Ingest Source Intelligence</h3>
-                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Paste text or reference a modular transcript</p>
+                                        <h3 className="text-lg font-bold text-primary-text tracking-tight uppercase italic decoration-slate-100">Upload Source Material</h3>
+                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Paste text or reference course content</p>
                                     </div>
                                 </div>
 
                                 <textarea
                                     value={content}
                                     onChange={(e) => setContent(e.target.value)}
-                                    placeholder="Input lecture transcripts, research notes, or textbook excerpts to extract evaluation vectors..."
+                                    placeholder="Input lecture transcripts, research notes, or textbook excerpts to generate assessment questions..."
                                     className="w-full h-[300px] p-6 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-600 focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all italic leading-relaxed shadow-inner"
                                 />
 
                                 <div className="mt-8 flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic">Axiom Link Operational</span>
+                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic">AI Engine Ready</span>
                                     </div>
                                     <button
                                         disabled={!content.trim()}
                                         onClick={() => setStep(2)}
                                         className="px-8 py-3.5 bg-accent text-white rounded-xl text-xs font-bold shadow-lg border border-slate-700 hover:bg-slate-800 transition-all flex items-center gap-2 disabled:opacity-50 uppercase tracking-[0.2em]"
                                     >
-                                        Proceed to Parameterize
+                                        Proceed to Configure
                                         <ArrowRight size={16} />
                                     </button>
                                 </div>
@@ -140,7 +139,7 @@ export default function AssessmentGenerationPage() {
                                             <Target size={24} />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-bold text-primary-text tracking-tight uppercase italic decoration-slate-100">Configure Evaluation Matrix</h3>
+                                            <h3 className="text-lg font-bold text-primary-text tracking-tight uppercase italic decoration-slate-100">Configure Assessment</h3>
                                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Define the rigor and structure of the output</p>
                                         </div>
                                     </div>
@@ -148,7 +147,7 @@ export default function AssessmentGenerationPage() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                         <div className="space-y-6">
                                             <div className="space-y-3">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Assessment Morphology</label>
+                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Assessment Type</label>
                                                 <div className="grid grid-cols-3 gap-2">
                                                     {(['quiz', 'exam', 'rubric'] as const).map(type => (
                                                         <button
@@ -166,9 +165,9 @@ export default function AssessmentGenerationPage() {
                                             </div>
 
                                             <div className="space-y-3">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Rigor Coefficient</label>
+                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Difficulty Level</label>
                                                 <div className="grid grid-cols-3 gap-2">
-                                                    {(['normal', 'rigorous', 'elite'] as const).map(diff => (
+                                                    {(['normal', 'rigorous', 'advanced'] as const).map(diff => (
                                                         <button
                                                             key={diff}
                                                             onClick={() => setDifficulty(diff)}
@@ -186,7 +185,7 @@ export default function AssessmentGenerationPage() {
 
                                         <div className="space-y-6">
                                             <div className="space-y-3">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Quantum of Inquiries</label>
+                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Number of Questions</label>
                                                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 flex items-center justify-between shadow-inner">
                                                     <button
                                                         onClick={() => setQuestionCount(Math.max(1, questionCount - 1))}
@@ -196,7 +195,7 @@ export default function AssessmentGenerationPage() {
                                                     </button>
                                                     <div className="text-center">
                                                         <span className="text-3xl font-black text-primary-text italic">{questionCount}</span>
-                                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Units</p>
+                                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Questions</p>
                                                     </div>
                                                     <button
                                                         onClick={() => setQuestionCount(Math.min(20, questionCount + 1))}
@@ -215,7 +214,7 @@ export default function AssessmentGenerationPage() {
                                             className="text-[10px] font-black text-slate-400 hover:text-primary-text uppercase tracking-widest flex items-center gap-2 transition-colors"
                                         >
                                             <ChevronRight className="rotate-180" size={14} />
-                                            Revisit Intelligence
+                                            Edit Source Material
                                         </button>
                                         <button
                                             onClick={handleGenerate}
@@ -223,7 +222,7 @@ export default function AssessmentGenerationPage() {
                                             className="px-10 py-4 bg-slate-900 text-white rounded-xl text-xs font-bold shadow-xl border border-slate-800 hover:bg-black transition-all flex items-center gap-3 uppercase tracking-[0.2em]"
                                         >
                                             {generating ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} className="text-accent" />}
-                                            {generating ? "Synthesizing..." : "Initiate Synthesis"}
+                                            {generating ? "Generating..." : "Generate Questions"}
                                         </button>
                                     </div>
                                 </div>
@@ -238,8 +237,8 @@ export default function AssessmentGenerationPage() {
                                         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '15px 15px' }} />
 
                                         <div className="relative z-10">
-                                            <h3 className="text-xl font-bold text-white tracking-tight italic uppercase underline decoration-accent/30">Output Ledger</h3>
-                                            <p className="text-[10px] text-accent font-black uppercase tracking-[0.3em] mt-1">AI-Generated Verification Ready</p>
+                                            <h3 className="text-xl font-bold text-white tracking-tight italic uppercase underline decoration-accent/30">Generated Questions</h3>
+                                            <p className="text-[10px] text-accent font-black uppercase tracking-[0.3em] mt-1">AI-Generated — Ready for Review</p>
                                         </div>
                                         <div className="flex gap-2 relative z-10">
                                             <button className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all shadow-sm">
@@ -250,7 +249,7 @@ export default function AssessmentGenerationPage() {
                                             </button>
                                             <button className="px-6 py-2.5 bg-accent text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg border border-slate-800 hover:bg-slate-800 transition-all flex items-center gap-2">
                                                 <Download size={14} />
-                                                Commit to Registry
+                                                Save to Course
                                             </button>
                                         </div>
                                     </div>
@@ -259,7 +258,7 @@ export default function AssessmentGenerationPage() {
                                         {generatedQuestions.map((q, i) => (
                                             <div key={q.id} className="p-6 bg-slate-50 border border-slate-200 rounded-2xl group hover:bg-white hover:shadow-sharp transition-all duration-300">
                                                 <div className="flex items-center justify-between mb-4">
-                                                    <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest italic group-hover:text-accent transition-colors">Vector {i + 1}</span>
+                                                    <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest italic group-hover:text-accent transition-colors">Question {i + 1}</span>
                                                     <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-white border border-slate-100 italic">
                                                         <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Multiple Choice</span>
                                                     </div>
@@ -284,7 +283,7 @@ export default function AssessmentGenerationPage() {
                                                 <div className="pt-4 border-t border-slate-100 flex flex-col gap-2">
                                                     <div className="flex items-center gap-2 text-slate-400 group-hover:text-amber-600 transition-colors">
                                                         <Wand2 size={12} />
-                                                        <span className="text-[9px] font-black uppercase tracking-widest">Logic Attribution</span>
+                                                        <span className="text-[9px] font-black uppercase tracking-widest">Explanation</span>
                                                     </div>
                                                     <p className="text-[10px] text-slate-400 font-medium italic leading-relaxed">{q.explanation}</p>
                                                 </div>
@@ -297,7 +296,7 @@ export default function AssessmentGenerationPage() {
                                                 className="px-8 py-3 bg-white border border-slate-200 rounded-xl text-[10px] font-black text-slate-400 hover:text-accent hover:border-accent transition-all flex items-center gap-2 uppercase tracking-widest shadow-sm"
                                             >
                                                 <RefreshCw size={14} />
-                                                Regenerate Matrix
+                                                Regenerate Questions
                                             </button>
                                         </div>
                                     </div>
@@ -318,9 +317,9 @@ export default function AssessmentGenerationPage() {
 
                             <div className="space-y-6 relative z-10">
                                 <div className="flex items-center justify-between">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Neural Link</span>
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">AI Status</span>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-black text-emerald-500 uppercase">Synchronous</span>
+                                        <span className="text-[10px] font-black text-emerald-500 uppercase">Connected</span>
                                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                     </div>
                                 </div>
@@ -330,13 +329,13 @@ export default function AssessmentGenerationPage() {
                                 </div>
                                 <div className="flex items-center justify-between">
                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Model Precision</span>
-                                    <span className="text-[10px] font-black text-accent italic">Elite (98.4%)</span>
+                                    <span className="text-[10px] font-black text-accent italic">High (98.4%)</span>
                                 </div>
                             </div>
 
                             <div className="mt-8 pt-6 border-t border-white/5 space-y-4 relative z-10">
                                 <p className="text-[10px] text-slate-500 font-medium italic leading-relaxed">
-                                    Synthetic assessment generation utilizes <span className="text-white">Multi-Vector Analysis</span> to ensure pedagogical alignment.
+                                    Synthetic assessment generation utilizes <span className="text-white">advanced analysis</span> to ensure pedagogical alignment.
                                 </p>
                                 <div className="p-3 bg-white/5 rounded-xl border border-white/10 flex items-center gap-3">
                                     <div className="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center text-accent">
@@ -351,7 +350,7 @@ export default function AssessmentGenerationPage() {
                         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm border-b-4 border-b-slate-100">
                             <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
                                 <History size={14} className="text-accent" />
-                                Synthesis Ledger
+                                Generation History
                             </h4>
                             <div className="space-y-4">
                                 {[
@@ -366,14 +365,14 @@ export default function AssessmentGenerationPage() {
                                             </div>
                                             <div>
                                                 <p className="text-xs font-bold text-primary-text group-hover:underline decoration-slate-200">{h.title}</p>
-                                                <p className="text-[9px] font-bold text-slate-300 uppercase tracking-tighter mt-0.5">{h.count} Vectors • {h.date}</p>
+                                                <p className="text-[9px] font-bold text-slate-300 uppercase tracking-tighter mt-0.5">{h.count} Questions • {h.date}</p>
                                             </div>
                                         </div>
                                         <ChevronRight size={14} className="text-slate-300 group-hover:text-accent transition-all transform group-hover:translate-x-1" />
                                     </div>
                                 ))}
                             </div>
-                            <button className="w-full mt-6 py-2.5 rounded-xl border border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:bg-slate-50 transition-all">View Audit Vault</button>
+                            <button className="w-full mt-6 py-2.5 rounded-xl border border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:bg-slate-50 transition-all">View All History</button>
                         </div>
 
                         {/* Tip Center */}
@@ -384,12 +383,11 @@ export default function AssessmentGenerationPage() {
                                 <span className="text-[10px] font-bold uppercase tracking-widest italic">Optimization Tip</span>
                             </div>
                             <p className="text-[10px] text-amber-800 font-medium leading-relaxed italic relative z-10">
-                                For <span className="font-bold underline decoration-amber-200">Elite Level</span> rigor, ensure the source material includes context-rich examples and research paper citations.
+                                For <span className="font-bold underline decoration-amber-200">Advanced</span> difficulty, ensure the source material includes context-rich examples and research paper citations.
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
-        </DashboardShell>
     );
 }

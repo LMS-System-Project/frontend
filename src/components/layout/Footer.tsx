@@ -14,7 +14,7 @@ export default function Footer() {
               <span className="text-xl font-bold tracking-tight">GradeFlow</span>
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed mb-8">
-              The professional standard for institutional learning and management lifecycle systems.
+              The professional standard for academic learning and management systems.
             </p>
             <div className="space-y-3">
               <a href="mailto:contact@gradeflow.edu" className="flex items-center gap-3 text-sm text-slate-400 hover:text-white transition-colors">

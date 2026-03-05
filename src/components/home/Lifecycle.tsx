@@ -59,7 +59,7 @@ export default function Lifecycle() {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent flex items-end p-8">
                             <div className="text-white">
-                                <div className="text-xs font-black uppercase tracking-widest mb-2 opacity-80">Institutional Motion</div>
+                                <div className="text-xs font-black uppercase tracking-widest mb-2 opacity-80">Learning in Motion</div>
                                 <div className="text-2xl font-bold">Visualizing the Student Journey</div>
                             </div>
                         </div>

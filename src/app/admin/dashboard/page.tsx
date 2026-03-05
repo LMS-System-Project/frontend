@@ -69,18 +69,18 @@ export default function AdminDashboard() {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-10"
     >
-      {/* Institutional Header */}
+      {/* Admin Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
         <div>
           <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-[0.25em] mb-3">
             <ShieldCheck size={14} className="text-accent" />
-            <span>Root Administrator • Session Encrypted</span>
+            <span>Administrator • Secure Session</span>
           </div>
           <h1 className="text-4xl font-bold text-primary-text tracking-tight mb-2">
-            Institutional Control Center
+            Admin Dashboard
           </h1>
           <p className="text-sm text-slate-500 max-w-xl">
-            Global academic oversight and infrastructure monitoring for <span className="text-accent font-bold underline decoration-accent/20 underline-offset-4 font-serif italic">Autumn Semester 2025</span>.
+            Platform-wide academic oversight and performance monitoring for <span className="text-accent font-bold underline decoration-accent/20 underline-offset-4 font-serif italic">Autumn Semester 2025</span>.
           </p>
         </div>
 
@@ -90,18 +90,18 @@ export default function AdminDashboard() {
           className="flex items-center gap-6 bg-white border border-slate-200 rounded-2xl p-4 px-8 shadow-xl"
         >
           <div className="flex flex-col">
-            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Infrastructure Pulse</span>
+            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">System Health</span>
             <div className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.4)]" />
-              <span className="text-xs font-bold text-slate-700 tracking-tight">99.9% Latency Opt.</span>
+              <span className="text-xs font-bold text-slate-700 tracking-tight">99.9% Uptime</span>
             </div>
           </div>
           <div className="w-px h-10 bg-slate-100" />
           <div className="flex flex-col">
-            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Network Nodes</span>
+            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Servers</span>
             <div className="flex items-center gap-2 text-accent">
               <Globe size={16} />
-              <span className="text-xs font-bold uppercase tracking-tight">12 Global Hubs</span>
+              <span className="text-xs font-bold uppercase tracking-tight">12 Active Nodes</span>
             </div>
           </div>
         </motion.div>
@@ -111,7 +111,7 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           { label: "Total Enrollments", val: "5,284", icon: Users, color: "text-blue-600", bg: "bg-blue-50/50", trend: "+2.4%" },
-          { label: "Active Modules", val: "127", icon: BookOpen, color: "text-slate-600", bg: "bg-slate-100/50", trend: "+5%" },
+          { label: "Active Courses", val: "127", icon: BookOpen, color: "text-slate-600", bg: "bg-slate-100/50", trend: "+5%" },
           { label: "Live Sessions", val: "892", icon: Zap, color: "text-emerald-600", bg: "bg-emerald-50/50", trend: "+12%" },
           { label: "At-Risk Alerts", val: "47", icon: ShieldAlert, color: "text-red-600", bg: "bg-red-50/50", trend: "-2%" },
         ].map((stat, i) => (
@@ -148,8 +148,8 @@ export default function AdminDashboard() {
         >
           <div className="flex items-center justify-between mb-10">
             <div>
-              <h3 className="text-xl font-bold text-primary-text tracking-tight uppercase">Institutional Growth</h3>
-              <p className="text-xs text-slate-500 font-medium italic">Enrolment dynamics: Students vs Faculty (6M)</p>
+              <h3 className="text-xl font-bold text-primary-text tracking-tight uppercase">Enrollment Growth</h3>
+              <p className="text-xs text-slate-500 font-medium italic">Enrolment trends: Students vs Faculty (6M)</p>
             </div>
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
@@ -231,9 +231,9 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3 text-red-600">
               <ShieldAlert size={22} className="animate-pulse" />
-              <h3 className="text-xs font-black uppercase tracking-[0.2em]">Intervention Matrix</h3>
+              <h3 className="text-xs font-black uppercase tracking-[0.2em]">At-Risk Students</h3>
             </div>
-            <span className="text-[10px] font-black text-slate-400 border border-slate-100 px-3 py-1 rounded-full uppercase tracking-widest">47 Active Vectors</span>
+            <span className="text-[10px] font-black text-slate-400 border border-slate-100 px-3 py-1 rounded-full uppercase tracking-widest">47 Active Alerts</span>
           </div>
           <div className="space-y-4 flex-1">
             {riskFeed.map((student, i) => (
@@ -261,7 +261,7 @@ export default function AdminDashboard() {
             href="/admin/students"
             className="w-full mt-10 py-4 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.25em] flex items-center justify-center gap-3 hover:bg-black transition-all shadow-xl"
           >
-            Access Risk Heatmap
+            View All At-Risk Students
             <ArrowRight size={16} />
           </Link>
         </motion.div>
@@ -275,8 +275,8 @@ export default function AdminDashboard() {
         >
           <div className="flex items-center justify-between mb-10">
             <div>
-              <h3 className="text-xl font-bold text-primary-text tracking-tight uppercase">Institutional Event Log</h3>
-              <p className="text-xs text-slate-500 font-medium italic">Real-time infrastructure activity monitor</p>
+              <h3 className="text-xl font-bold text-primary-text tracking-tight uppercase">Activity Log</h3>
+              <p className="text-xs text-slate-500 font-medium italic">Real-time platform activity monitor</p>
             </div>
             <button className="p-3 rounded-xl hover:bg-slate-50 text-slate-400 transition-all border border-transparent hover:border-slate-200">
               <MoreHorizontal size={22} />
@@ -308,15 +308,15 @@ export default function AdminDashboard() {
               <div className="relative z-10">
                 <div className="flex items-center gap-2 text-accent mb-6">
                   <Command size={16} />
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">Sys Prediction</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">AI Prediction</span>
                 </div>
                 <p className="text-xs text-slate-600 leading-relaxed italic font-medium mb-6">
-                  &ldquo;Overall institutional velocity has increased by 1.2% this month. The CS department remains the primary driver of academic proficiency markers. Infrastructure overhead remains optimal at 14%.&rdquo;
+                  &ldquo;Overall platform performance has increased by 1.2% this month. The CS department remains the primary driver of academic proficiency. System overhead remains optimal at 14%.&rdquo;
                 </p>
               </div>
               <div className="flex items-center gap-3 relative z-10">
                 <div className="w-8 h-8 rounded-xl bg-accent border border-slate-800 flex items-center justify-center text-[10px] font-black text-white italic shadow-lg">GF</div>
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Engine Core v4.28</span>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">GradeFlow AI v4.28</span>
               </div>
               {/* Decorative design */}
               <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-accent/5 rounded-full blur-3xl group-hover:bg-accent/10 transition-all" />

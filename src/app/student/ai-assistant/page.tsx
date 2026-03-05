@@ -20,23 +20,23 @@ import {
 const INITIAL_MESSAGES = [
     {
         role: "ai",
-        text: "Hello Alexandra! I'm your GradeFlow Intelligence Advisor. I've analyzed your Semester 6 progression and logic competency. How can I assist your academic trajectory today?",
+        text: "Hello! I'm your GradeFlow AI Assistant. I've analyzed your academic progress and can help with study planning, grade predictions, and course recommendations. How can I help you today?",
     },
 ];
 
 const QUICK_PROMPTS = [
-    "Simulate GPA trend for S7",
-    "Analyze Physics Chapter 8 proficiency",
-    "Optimize my weekly study load",
-    "Identify cross-department electives",
+    "Predict my GPA for next semester",
+    "Help me understand Physics Chapter 8",
+    "Optimize my weekly study schedule",
+    "Suggest elective courses for me",
 ];
 
 const STUDY_PLAN = [
     { day: "MON", tasks: ["Advanced Logic: Probabilistic Models (2h)", "CS: Kernel Architectures (1.5h)"] },
-    { day: "TUE", tasks: ["Calculus III: Vector Manifolds (2h)", "Elective: Blockchain Fundamentals (1h)"] },
+    { day: "TUE", tasks: ["Calculus III: Multivariable Topics (2h)", "Elective: Blockchain Fundamentals (1h)"] },
     { day: "WED", tasks: ["CS: Distributed Hash Tables (2h)", "Physics: Quantum Entanglement Lab (1h)"] },
     { day: "THU", tasks: ["Mathematics: Stochastic Processes (2h)", "Career: Industry Placement Sync (1h)"] },
-    { day: "FRI", tasks: ["Institutional Revision Cycle (2h)", "Simulated Mock Evaluation (1h)"] },
+    { day: "FRI", tasks: ["Review and Revision (2h)", "Practice Mock Tests (1h)"] },
 ];
 
 export default function StudentAIAssistantPage() {
@@ -49,7 +49,7 @@ export default function StudentAIAssistantPage() {
         const userMsg = { role: "user", text };
         const aiResponse = {
             role: "ai",
-            text: `Analyzing context for: "${text}"... Based on your academic standing (TOP 5%), I recommend focusing on the multivariate logic markers in your upcoming CS assignments. Would you like a simulated study path for these specific modules?`,
+            text: `Analyzing: "${text}"... Based on your academic standing (Top 5%), I recommend focusing on the key concepts in your upcoming CS assignments. Would you like me to create a personalized study plan for these topics?`,
         };
         setMessages((prev) => [...prev, userMsg, aiResponse]);
         setInput("");
@@ -57,16 +57,16 @@ export default function StudentAIAssistantPage() {
 
     return (
         <div className="space-y-8 max-w-[1200px] mx-auto">
-            {/* Governance Header */}
+            {/* Page Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
                     <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
                         <Sparkles size={14} className="text-accent" />
-                        <span>Elite Academic Intelligence • Active Session</span>
+                        <span>AI Assistant • Active Session</span>
                     </div>
-                    <h1 className="text-3xl font-bold text-primary-text tracking-tight">GradeFlow Intelligence Assistant</h1>
+                    <h1 className="text-3xl font-bold text-primary-text tracking-tight">AI Academic Assistant</h1>
                     <p className="text-sm text-slate-500 mt-1">
-                        Context-aware advisory system synchronized with your institutional data.
+                        Your personal academic advisor, powered by AI and your course data.
                     </p>
                 </div>
                 <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-lg p-2 px-4 shadow-sm">
@@ -80,9 +80,9 @@ export default function StudentAIAssistantPage() {
             {/* Functional Tabs */}
             <div className="bg-slate-100 p-1 rounded-xl w-fit flex items-center border border-slate-200">
                 {[
-                    { id: "chat", icon: Brain, label: "Intelligence Chat" },
-                    { id: "planner", icon: CalendarDays, label: "Adaptive Planner" },
-                    { id: "advisor", icon: Target, label: "Trajectory Advisor" },
+                    { id: "chat", icon: Brain, label: "Chat" },
+                    { id: "planner", icon: CalendarDays, label: "Study Planner" },
+                    { id: "advisor", icon: Target, label: "Academic Advisor" },
                 ].map((tab) => (
                     <button
                         key={tab.id}
@@ -106,8 +106,8 @@ export default function StudentAIAssistantPage() {
                                     <Brain size={18} />
                                 </div>
                                 <div>
-                                    <div className="text-xs font-bold text-primary-text leading-none">Intelligence Engine</div>
-                                    <div className="text-[10px] text-slate-400 font-bold leading-none mt-1 uppercase tracking-widest">Model: GradeFlow-X1</div>
+                                    <div className="text-xs font-bold text-primary-text leading-none">AI Assistant</div>
+                                    <div className="text-[10px] text-slate-400 font-bold leading-none mt-1 uppercase tracking-widest">Model: GradeFlow AI</div>
                                 </div>
                             </div>
                             <button className="p-1.5 rounded-lg hover:bg-slate-50 text-slate-400"><History size={18} /></button>
@@ -150,7 +150,7 @@ export default function StudentAIAssistantPage() {
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     onKeyDown={(e) => e.key === "Enter" && sendMessage(input)}
-                                    placeholder="Execute academic query..."
+                                    placeholder="Ask a question..."
                                     className="flex-1 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all"
                                 />
                                 <button
@@ -166,11 +166,11 @@ export default function StudentAIAssistantPage() {
                     {/* Context Constraints */}
                     <div className="space-y-6">
                         <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Context Vectors</h3>
+                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Your Profile</h3>
                             <div className="space-y-2">
                                 {[
                                     { label: "CGPA (Current)", val: "8.7" },
-                                    { label: "Cohort Rank", val: "#12 / 280" },
+                                    { label: "Class Rank", val: "#12 / 280" },
                                     { label: "Department", val: "CS Core" },
                                     { label: "S6 Credits", val: "22 / 22" },
                                     { label: "Alerts Due", val: "03 ACTIVE" },
@@ -186,7 +186,7 @@ export default function StudentAIAssistantPage() {
                         <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm text-white">
                             <div className="flex items-center gap-2 mb-4 text-emerald-400">
                                 <Lightbulb size={18} />
-                                <h3 className="text-xs font-bold uppercase tracking-widest">Model Capabilities</h3>
+                                <h3 className="text-xs font-bold uppercase tracking-widest">AI Capabilities</h3>
                             </div>
                             <div className="space-y-3">
                                 {[
@@ -211,7 +211,7 @@ export default function StudentAIAssistantPage() {
                 <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
                     <div className="flex items-center justify-between mb-8">
                         <div>
-                            <h2 className="text-lg font-bold text-primary-text tracking-tight mb-1">Weekly Intelligence Plan</h2>
+                            <h2 className="text-lg font-bold text-primary-text tracking-tight mb-1">Weekly Study Plan</h2>
                             <p className="text-xs text-slate-500 italic">Optimized schedule based on upcoming assessment deadlines.</p>
                         </div>
                         <button className="px-4 py-2 bg-accent text-white rounded-md text-xs font-bold border border-slate-700 shadow-sm">Re-Optimize Schedule</button>
@@ -241,17 +241,17 @@ export default function StudentAIAssistantPage() {
                             <Target size={32} />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-primary-text tracking-tight mb-1 italic underline decoration-slate-200">Trajectory Advisory Console</h2>
-                            <p className="text-sm text-slate-500">Autonomous intelligence predicting long-term academic and career outcomes.</p>
+                            <h2 className="text-xl font-bold text-primary-text tracking-tight mb-1 italic underline decoration-slate-200">Academic Advisor</h2>
+                            <p className="text-sm text-slate-500">AI-powered recommendations for your long-term academic and career goals.</p>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                         <div className="space-y-8">
                             {[
-                                { cat: "Immediate High-Impact", color: "text-red-500", items: ["Complete Logic Gaps in Semester 6 Modules", "Initialize Career Track Selection (Deadline in 12d)"] },
-                                { cat: "Mid-Term Strategic", color: "text-amber-500", items: ["Audit Semester 7 Pre-requisites", "Schedule Review with Faculty Mentor Prof. Chen"] },
-                                { cat: "Long-Term Goal (GPA 9.0)", color: "text-emerald-500", items: ["Target 12% increase in Quantitative markers", "Engage in Institutional Research Projects"] }
+                                { cat: "Immediate High-Impact", color: "text-red-500", items: ["Complete gaps in Semester 6 coursework", "Select your career track (Deadline in 12 days)"] },
+                                { cat: "Mid-Term Strategic", color: "text-amber-500", items: ["Review Semester 7 prerequisites", "Schedule meeting with Faculty Mentor Prof. Chen"] },
+                                { cat: "Long-Term Goal (GPA 9.0)", color: "text-emerald-500", items: ["Target 12% improvement in quantitative scores", "Participate in research projects"] }
                             ].map((sect, i) => (
                                 <div key={i} className="space-y-4">
                                     <div className={`text-[10px] font-extrabold uppercase tracking-[0.2em] ${sect.color}`}>{sect.cat}</div>
@@ -272,19 +272,19 @@ export default function StudentAIAssistantPage() {
                                 <div className="space-y-6 relative z-10">
                                     <div className="flex items-center gap-2 text-emerald-400">
                                         <CheckCircle2 size={24} />
-                                        <span className="text-sm font-bold uppercase tracking-widest">Optimization Complete</span>
+                                        <span className="text-sm font-bold uppercase tracking-widest">Analysis Complete</span>
                                     </div>
                                     <h4 className="text-2xl font-bold tracking-tight italic leading-snug">
                                         Your trajectory toward <span className="underline decoration-emerald-500 text-emerald-400">Advanced AI Research</span> is currently at <span className="text-emerald-400">88%</span> proficiency.
                                     </h4>
                                     <p className="text-xs text-slate-400 leading-relaxed font-medium">
-                                        Intelligence model suggests maintaining core logic performance while increasing engagement with institutional research labs within the next 4 months.
+                                        We recommend maintaining your core performance while increasing engagement with research labs within the next 4 months.
                                     </p>
                                 </div>
                                 <div className="mt-8 pt-6 border-t border-slate-800 flex items-center justify-between relative z-10">
                                     <div className="flex items-center gap-2">
                                         <Clock size={16} className="text-slate-500" />
-                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Next Auto-Sync: 24h</span>
+                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Next Update: 24h</span>
                                     </div>
                                     <button className="text-xs font-bold text-emerald-400 flex items-center gap-1 hover:gap-2 transition-all group">
                                         Detailed Strategy <ChevronRight size={16} />

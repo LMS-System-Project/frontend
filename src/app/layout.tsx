@@ -18,7 +18,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "GradeFlow – Intelligent Academic Management System",
   description:
-    "A production-grade academic management platform for universities. Powered by AI analytics, institutional design, and enterprise-grade architecture.",
+    "A production-grade academic management platform for universities. Powered by AI analytics, modern design, and enterprise-grade architecture.",
   keywords: [
     "academic management",
     "LMS",

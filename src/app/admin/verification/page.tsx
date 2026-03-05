@@ -57,16 +57,16 @@ export default function BlockchainVerificationPage() {
     return (
         <DashboardShell role="admin">
             <div className="space-y-8 max-w-[1200px] mx-auto pb-20">
-                {/* Governance Header */}
+                {/* Page Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
                         <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
                             <Lock size={14} className="text-accent" />
-                            <span>Institutional Integrity • Immutable Ledger</span>
+                            <span>Academic Integrity • Verification Ledger</span>
                         </div>
                         <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">Credential Verification</h1>
                         <p className="text-sm text-slate-500 mt-1">
-                            Deploying <span className="text-accent font-bold italic">Cryptographic Proof</span> to secure institutional academic vectors.
+                            Using <span className="text-accent font-bold italic">cryptographic proof</span> to secure academic records and credentials.
                         </p>
                     </div>
 
@@ -116,7 +116,7 @@ export default function BlockchainVerificationPage() {
                                         className="w-full py-5 bg-accent text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] shadow-xl border border-slate-700 hover:bg-slate-800 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                                     >
                                         {verifying ? <RefreshCw size={18} className="animate-spin" /> : <ShieldCheck size={18} />}
-                                        {verifying ? "Executing Verification Sequence..." : "Audit Transaction"}
+                                        {verifying ? "Verifying..." : "Verify Record"}
                                     </button>
                                 </div>
 
@@ -125,9 +125,9 @@ export default function BlockchainVerificationPage() {
                                         }`}>
                                         {result === 'success' ? <CheckCircle size={24} /> : <ShieldAlert size={24} />}
                                         <div>
-                                            <p className="text-xs font-black uppercase tracking-widest">{result === 'success' ? 'Vector Validated' : 'Validation Error'}</p>
+                                            <p className="text-xs font-black uppercase tracking-widest">{result === 'success' ? 'Record Verified' : 'Verification Failed'}</p>
                                             <p className="text-[10px] font-medium italic mt-0.5 opacity-80">
-                                                {result === 'success' ? 'Integrity check complete. Institutional ledger synced with 0x8f...e7b1.' : 'No institutional match found for the provided hash vector.'}
+                                                {result === 'success' ? 'Integrity check complete. Ledger synced with 0x8f...e7b1.' : 'No matching record found for the provided hash.'}
                                             </p>
                                         </div>
                                     </div>
@@ -135,15 +135,15 @@ export default function BlockchainVerificationPage() {
                             </div>
                         </div>
 
-                        {/* Immutable Ledger Registry */}
+                        {/* Verification Records */}
                         <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm border-b-4 border-b-slate-100">
                             <div className="p-8 border-b border-slate-100 flex items-center justify-between">
                                 <div>
                                     <h3 className="text-sm font-black text-primary-text uppercase tracking-widest flex items-center gap-2 italic">
                                         <Database size={16} className="text-accent" />
-                                        Institutional Ledger Registry
+                                        Verification Records
                                     </h3>
-                                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1 italic">Public Repository of Synchronized Credentials</p>
+                                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1 italic">Repository of Verified Credentials</p>
                                 </div>
                                 <button className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-400 hover:text-accent hover:border-accent transition-all">
                                     <Download size={18} />
@@ -153,7 +153,7 @@ export default function BlockchainVerificationPage() {
                             <table className="w-full">
                                 <thead>
                                     <tr className="bg-slate-50/50">
-                                        {["Entity", "Registry ID", "Cryptographic Hash", "Timestamp", "State", ""].map((h, i) => (
+                                        {["Entity", "Student ID", "Cryptographic Hash", "Timestamp", "State", ""].map((h, i) => (
                                             <th key={i} className="text-left px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                                                 {h}
                                             </th>
@@ -198,7 +198,7 @@ export default function BlockchainVerificationPage() {
 
                             <div className="p-6 bg-slate-50/50 text-center border-t border-slate-100">
                                 <button className="text-[10px] font-black text-slate-400 hover:text-accent uppercase tracking-widest flex items-center justify-center gap-2 mx-auto">
-                                    Expand Ledger Repository
+                                    View All Records
                                     <ChevronRight size={14} />
                                 </button>
                             </div>
@@ -219,7 +219,7 @@ export default function BlockchainVerificationPage() {
 
                             <div className="space-y-6">
                                 {[
-                                    { label: "Institutional Validator", val: "Operational", col: "emerald-500" },
+                                    { label: "Verification Service", val: "Operational", col: "emerald-500" },
                                     { label: "Relay Latency", val: "14ms", col: "accent" },
                                     { label: "Block Synchronization", val: "100%", col: "emerald-500" },
                                 ].map((stat, i) => (
@@ -232,7 +232,7 @@ export default function BlockchainVerificationPage() {
 
                             <button className="w-full mt-10 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:bg-slate-100 transition-all flex items-center justify-center gap-2">
                                 <Zap size={14} className="text-amber-500" />
-                                Reset Validator Node
+                                Reset Verification Node
                             </button>
                         </div>
 
@@ -240,13 +240,13 @@ export default function BlockchainVerificationPage() {
                         <div className="bg-slate-900 border border-slate-800 rounded-[32px] p-8 text-white shadow-2xl relative overflow-hidden">
                             <h4 className="text-[10px] font-black text-accent uppercase tracking-widest mb-8 flex items-center gap-2">
                                 <History size={14} />
-                                Recent Block Matrix
+                                Recent Transactions
                             </h4>
                             <div className="space-y-6">
                                 {[
                                     { hash: "0x8f...e7b1", type: "Certificate", time: "2m ago" },
                                     { hash: "0x4d...a9f2", type: "Grade Commit", time: "12m ago" },
-                                    { hash: "0x7a...c3d4", type: "Registry Sync", time: "45m ago" },
+                                    { hash: "0x7a...c3d4", type: "Record Sync", time: "45m ago" },
                                 ].map((block, i) => (
                                     <div key={i} className="flex items-center gap-4 group cursor-pointer">
                                         <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-accent group-hover:bg-accent group-hover:text-white transition-all">
@@ -271,7 +271,7 @@ export default function BlockchainVerificationPage() {
                                 Audit Advisory
                             </h4>
                             <p className="text-[10px] text-amber-800 font-medium leading-relaxed italic">
-                                Any detected discrepancies in the <span className="font-bold underline decoration-amber-200">Hash Vector</span> will trigger an immediate system lock and notification to the Institutional Board.
+                                Any detected discrepancies in the <span className="font-bold underline decoration-amber-200">verification hash</span> will trigger an immediate system lock and notification to the administration.
                             </p>
                         </div>
                     </div>

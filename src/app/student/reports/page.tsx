@@ -46,10 +46,10 @@ const semesterGrades = [
 
 const roadmapSteps = [
     { step: "Strengthen Advanced Calculus fundamentals", done: true, priority: "high", time: "Completed" },
-    { step: "Initialize Research Project in AI Ethics", done: true, priority: "medium", time: "Completed" },
-    { step: "Attend CS Advanced Workshop (Neural Networks)", done: false, priority: "high", time: "Week 12" },
+    { step: "Start Research Project in AI Ethics", done: true, priority: "medium", time: "Completed" },
+    { step: "Attend CS Advanced Workshop (Deep Learning)", done: false, priority: "high", time: "Week 12" },
     { step: "Submit Semester 6 Capstone Proposal", done: false, priority: "high", time: "Week 14" },
-    { step: "Prepare for GRE/GEMS Institutional Exam", done: false, priority: "medium", time: "Week 16" },
+    { step: "Prepare for GRE/GEMS Exam", done: false, priority: "medium", time: "Week 16" },
 ];
 
 export default function StudentReportsPage() {
@@ -60,11 +60,11 @@ export default function StudentReportsPage() {
                 <div>
                     <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
                         <Target size={14} className="text-accent" />
-                        <span>Adaptive Learning Engine • Analytics</span>
+                        <span>Academic Reports • Analytics</span>
                     </div>
                     <h1 className="text-3xl font-bold text-primary-text tracking-tight">Academic Roadmap & Insight</h1>
                     <p className="text-sm text-slate-500 mt-1">
-                        Detailed trajectory analysis based on institutional performance metrics.
+                        Detailed analysis based on your academic performance metrics.
                     </p>
                 </div>
                 <div className="flex gap-2">
@@ -73,7 +73,7 @@ export default function StudentReportsPage() {
                         <ChevronRight size={14} />
                     </button>
                     <button className="px-4 py-2 bg-accent text-white rounded-md text-xs font-bold shadow-sm border border-slate-700 hover:bg-slate-800 transition-all">
-                        Consult AI Academic Advisor
+                        Ask AI Advisor
                     </button>
                 </div>
             </div>
@@ -100,8 +100,8 @@ export default function StudentReportsPage() {
                         <span className="text-[10px] font-bold text-accent bg-slate-100 px-2 py-0.5 rounded-full">TOP 5%</span>
                     </div>
                     <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Global Percentile</h3>
-                    <div className="text-2xl font-bold text-primary-text mb-1 italic">Elite Standing</div>
-                    <p className="text-[10px] text-slate-500">Ranking strictly within university cohort across all depts.</p>
+                    <div className="text-2xl font-bold text-primary-text mb-1 italic">Top Performer</div>
+                    <p className="text-[10px] text-slate-500">Ranking within your university class across all departments.</p>
                 </div>
 
                 <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm border-t-4 border-t-accent">
@@ -154,7 +154,7 @@ export default function StudentReportsPage() {
 
                 <div className="bg-white border border-slate-200 rounded-xl p-8 shadow-sm">
                     <div className="mb-8">
-                        <h3 className="text-lg font-bold text-primary-text tracking-tight">Cohort Benchmarking</h3>
+                        <h3 className="text-lg font-bold text-primary-text tracking-tight">Grade Progression</h3>
                         <p className="text-xs text-slate-500 italic">Average semester-wise grade progression trend</p>
                     </div>
                     <div className="h-64">
@@ -184,8 +184,8 @@ export default function StudentReportsPage() {
                 <div className="flex items-center gap-2 mb-8 text-accent">
                     <BrainCircuit size={24} />
                     <div>
-                        <h3 className="text-lg font-bold tracking-tight leading-none mb-1">AI Adaptive Roadmap</h3>
-                        <p className="text-xs text-slate-500">Autonomous intelligence predicting optimal study paths.</p>
+                        <h3 className="text-lg font-bold tracking-tight leading-none mb-1">AI Study Roadmap</h3>
+                        <p className="text-xs text-slate-500">AI-powered recommendations for your optimal study path.</p>
                     </div>
                 </div>
 

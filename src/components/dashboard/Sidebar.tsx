@@ -36,32 +36,31 @@ const NAV_BY_ROLE = {
     { name: "Overview", href: "/student/dashboard", icon: LayoutDashboard },
     { name: "My Courses", href: "/student/courses", icon: BookOpen },
     { name: "Assignments", href: "/student/assignments", icon: FileText },
-    { name: "Academic Bot", href: "/student/ai-assistant", icon: MessageSquare },
-    { name: "Smart Planner", href: "/student/planner", icon: Calendar },
-    { name: "Collab Mesh", href: "/student/collab", icon: Users },
-    { name: "Career Hub", href: "/student/career", icon: Compass },
-    { name: "Doubt Solver", href: "/student/ai-assistant", icon: Brain },
+    { name: "AI Assistant", href: "/student/ai-assistant", icon: MessageSquare },
+    { name: "Study Planner", href: "/student/planner", icon: Calendar },
+    { name: "Study Groups", href: "/student/collab", icon: Users },
+    { name: "Career Services", href: "/student/career", icon: Compass },
   ],
   instructor: [
     { name: "Dashboard", href: "/instructor/dashboard", icon: LayoutDashboard },
-    { name: "Curriculum", href: "/instructor/courses", icon: BookOpen },
-    { name: "Attendance", href: "/instructor/students", icon: Users },
-    { name: "Evaluations", href: "/instructor/grading", icon: GraduationCap },
-    { name: "AI Gen Lab", href: "/instructor/assessments/generate", icon: Brain },
-    { name: "Insights", href: "/analytics", icon: BarChart2 },
+    { name: "Courses", href: "/instructor/courses", icon: BookOpen },
+    { name: "Students", href: "/instructor/students", icon: Users },
+    { name: "Grading", href: "/instructor/grading", icon: GraduationCap },
+    { name: "Assessment Builder", href: "/instructor/assessments/generate", icon: Brain },
+    { name: "Analytics", href: "/analytics", icon: BarChart2 },
   ],
   admin: [
-    { name: "System Control", href: "/admin/dashboard", icon: ShieldCheck },
+    { name: "Dashboard", href: "/admin/dashboard", icon: ShieldCheck },
     { name: "User Management", href: "/admin/students", icon: Users },
     { name: "Content", href: "/admin/content", icon: Layout },
-    { name: "Trust Ledger", href: "/admin/verification", icon: ShieldCheck },
-    { name: "AI Verification", href: "/admin/ai-tools", icon: Brain },
+    { name: "Verification", href: "/admin/verification", icon: ShieldCheck },
+    { name: "AI Tools", href: "/admin/ai-tools", icon: Brain },
   ],
 };
 
 const ROLE_LABELS: Record<string, string> = {
   student: "Student",
-  instructor: "Lead Faculty",
+  instructor: "Instructor",
   admin: "System Admin",
 };
 
@@ -82,7 +81,7 @@ export default function Sidebar({ role, collapsed, onToggle }: SidebarProps) {
       className={`fixed top-0 left-0 h-screen z-50 bg-accent transition-all duration-300 border-r border-slate-800 flex flex-col ${collapsed ? "w-20" : "w-64"
         }`}
     >
-      {/* Institutional Header */}
+      {/* Sidebar Header */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800">
         <Link href="/" className="flex items-center gap-3 overflow-hidden">
           <div className="bg-white p-1.5 rounded flex-shrink-0">
@@ -91,7 +90,7 @@ export default function Sidebar({ role, collapsed, onToggle }: SidebarProps) {
           {!collapsed && (
             <div className="flex flex-col">
               <span className="text-white font-bold tracking-tight text-sm">GradeFlow</span>
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none">Institutional</span>
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none">Learning Platform</span>
             </div>
           )}
         </Link>
@@ -107,7 +106,7 @@ export default function Sidebar({ role, collapsed, onToggle }: SidebarProps) {
       {!collapsed && (
         <div className="px-6 py-4">
           <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-3">
-            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Access Level</div>
+            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Role</div>
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-xs font-bold text-white uppercase tracking-tight">{ROLE_LABELS[role]}</span>
@@ -164,11 +163,11 @@ export default function Sidebar({ role, collapsed, onToggle }: SidebarProps) {
         <div className="p-6 bg-slate-900 border-t border-slate-800">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded bg-slate-800 flex items-center justify-center text-xs font-bold text-white border border-slate-700">
-              SV
+              {ROLE_LABELS[role]?.charAt(0) || "U"}
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-bold text-white truncate px-1">Sneha Varghese</p>
-              <p className="text-[10px] text-slate-500 truncate px-1 uppercase tracking-wider font-bold">Standard Tier</p>
+              <p className="text-xs font-bold text-white truncate px-1">{ROLE_LABELS[role]}</p>
+              <p className="text-[10px] text-slate-500 truncate px-1 uppercase tracking-wider font-bold">Active Session</p>
             </div>
           </div>
         </div>

@@ -78,7 +78,7 @@ export default function AnalyticsPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
         <div className="w-12 h-12 border-4 border-slate-100 border-t-accent rounded-full animate-spin" />
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Synthesizing Data Vectors...</span>
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Loading analytics...</span>
       </div>
     );
   }
@@ -89,20 +89,20 @@ export default function AnalyticsPage() {
   return (
     <DashboardShell role="instructor">
       <div className="space-y-8 max-w-[1200px] mx-auto pb-20">
-        {/* Governance Header */}
+        {/* Page Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <Link href="/instructor/dashboard" className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-4 hover:text-accent transition-colors">
               <ArrowLeft size={12} />
-              <span>Return to Faculty Console</span>
+              <span>Back to Dashboard</span>
             </Link>
             <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
               <BarChart3 size={14} className="text-accent" />
-              <span>Institutional Intelligence • Analytics Hub</span>
+              <span>Performance Analytics • Insights</span>
             </div>
-            <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">Instructional Insights</h1>
+            <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">Course Analytics</h1>
             <p className="text-sm text-slate-500 mt-1">
-              Deep-dive analysis of <span className="text-accent font-bold italic">learner engagement</span> and modular performance indices.
+              Deep-dive analysis of <span className="text-accent font-bold italic">learner engagement</span> and course performance metrics.
             </p>
           </div>
           <div className="flex gap-3">
@@ -112,7 +112,7 @@ export default function AnalyticsPage() {
             </button>
             <button className="px-4 py-2.5 bg-accent text-white rounded-xl text-[10px] font-bold shadow-lg border border-slate-700 hover:bg-slate-800 transition-all flex items-center gap-2 uppercase tracking-widest whitespace-nowrap">
               <Download size={14} />
-              Export Ledger
+              Export Report
             </button>
           </div>
         </div>
@@ -120,7 +120,7 @@ export default function AnalyticsPage() {
         {error && (
           <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 animate-in slide-in-from-top duration-300">
             <ArrowLeft size={14} />
-            ANALYTICS SYNC FAILED: {error}
+            ANALYTICS LOADING FAILED: {error}
           </div>
         )}
 
@@ -131,7 +131,7 @@ export default function AnalyticsPage() {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h3 className="text-lg font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-100">Platform Engagement Profile</h3>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Active Users vs Modular Engagement View</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Active Users vs Course Engagement</p>
               </div>
               <div className="flex gap-4">
                 <div className="flex items-center gap-2">
@@ -221,10 +221,10 @@ export default function AnalyticsPage() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-accent/20 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-accent/30 transition-all duration-500" />
               <h4 className="text-[10px] font-bold text-accent uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
                 <Zap size={12} />
-                Elite Prediction
+                AI Forecast
               </h4>
               <p className="text-xs text-slate-300 leading-relaxed font-medium italic relative z-10">
-                Based on current velocity, <span className="text-white font-bold">cohort performance</span> is expected to increase by <span className="text-accent underline">12.4%</span> in the next assessment cycle.
+                Based on current trends, <span className="text-white font-bold">student performance</span> is expected to increase by <span className="text-accent underline">12.4%</span> in the next assessment cycle.
               </p>
             </div>
           </div>
@@ -233,10 +233,10 @@ export default function AnalyticsPage() {
         {/* Tactical Metrics Row */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[
-            { label: "Active Nodes", val: "124", sub: "+12.5%", icon: Target },
-            { label: "Data Throughput", val: "1.2 TB", sub: "Nominal", icon: Activity },
-            { label: "Student Sinc", val: "99.8%", sub: "Global Avg", icon: Users },
-            { label: "Latency Index", val: "14ms", sub: "Elite", icon: MousePointer2 },
+            { label: "Active Students", val: "124", sub: "+12.5%", icon: Target },
+            { label: "Content Delivered", val: "1.2 TB", sub: "Healthy", icon: Activity },
+            { label: "Uptime", val: "99.8%", sub: "Global Avg", icon: Users },
+            { label: "Response Time", val: "14ms", sub: "Optimal", icon: MousePointer2 },
           ].map((m, i) => (
             <div key={i} className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm flex items-center gap-4 border-b-4 border-b-slate-100">
               <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-slate-400">

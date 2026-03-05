@@ -65,8 +65,8 @@ export default function LoginPage() {
             const data = await api.auth.login({ email: normalizedEmail, password });
             console.log("Login: Backend success, data returned:", data);
 
-            // Redirection logic based on role from backend or selection
-            const userRole = data.role || data.user?.role || roleMode;
+            // Determine role from the backend response (user.role is authoritative)
+            const userRole = data.user?.role || data.role;
             let targetPath = "/student/dashboard";
 
             if (userRole === "instructor" || userRole === "teacher") {
@@ -101,7 +101,7 @@ export default function LoginPage() {
             case "admin":
                 return {
                     title: "Admin Console",
-                    subtitle: "Institutional oversight and system control",
+                    subtitle: "Platform administration and management",
                     button: "Admin Sign In"
                 };
             case "teacher":

@@ -78,18 +78,17 @@ export default function StudentsPage() {
     const courseCount = new Set(students.map((s) => s.course_id)).size;
 
     return (
-        <DashboardShell role="instructor">
-            <div className="space-y-8 max-w-[1200px] mx-auto">
-                {/* Institutional Header */}
+        <div className="space-y-8 max-w-[1200px] mx-auto">
+                {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
                         <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
                             <Users size={14} className="text-accent" />
-                            <span>Academic Registry • Cohort Management</span>
+                            <span>Student Management</span>
                         </div>
-                        <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">Instructional Cohorts</h1>
+                        <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">My Students</h1>
                         <p className="text-sm text-slate-500 mt-1">
-                            Governance of <span className="text-accent font-bold">{uniqueStudentCount} Individual Learners</span> across your modular portfolio.
+                            Managing <span className="text-accent font-bold">{uniqueStudentCount} students</span> across your courses.
                         </p>
                     </div>
                     <div className="flex gap-4">
@@ -108,7 +107,7 @@ export default function StudentsPage() {
                             </div>
                             <div>
                                 <p className="text-xl font-black text-primary-text leading-none tracking-tighter italic">{courseCount}</p>
-                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Active Modules</p>
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Active Courses</p>
                             </div>
                         </div>
                     </div>
@@ -124,7 +123,7 @@ export default function StudentsPage() {
                     </div>
                 )}
 
-                {/* Tactical Search & Filter */}
+                {/* Search & Filter */}
                 <div className="flex flex-col sm:flex-row items-center gap-4 py-2">
                     <div className="relative flex-1 group w-full">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-accent transition-colors" size={18} />
@@ -132,7 +131,7 @@ export default function StudentsPage() {
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Scan cohort registry by name, department, or module code..."
+                            placeholder="Search students by name, department, or course..."
                             className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-accent transition-all shadow-sm"
                         />
                     </div>
@@ -145,16 +144,16 @@ export default function StudentsPage() {
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-32 space-y-4">
                         <div className="w-12 h-12 border-4 border-slate-100 border-t-accent rounded-full animate-spin" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Synchronizing Registry Schema...</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Loading students...</span>
                     </div>
                 ) : filtered.length === 0 ? (
                     <div className="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-20 text-center flex flex-col items-center group">
                         <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-6 group-hover:scale-110 group-hover:bg-accent group-hover:text-white transition-all duration-300">
                             <Users size={32} />
                         </div>
-                        <h4 className="text-base font-bold text-primary-text uppercase tracking-widest">{search ? "No Matches Identified" : "Institutional Void"}</h4>
+                        <h4 className="text-base font-bold text-primary-text uppercase tracking-widest">{search ? "No Results Found" : "No Students Yet"}</h4>
                         <p className="text-xs text-slate-400 max-w-xs mx-auto mt-2 italic font-medium leading-relaxed">
-                            {search ? `Your query "${search}" did not return any results from the instructional registry.` : "No active learners identified in your modular portfolio. Enrollments are synchronized automatically."}
+                            {search ? `Your search "${search}" did not return any results.` : "No students enrolled in your courses yet. Enrollments are updated automatically."}
                         </p>
                     </div>
                 ) : (
@@ -176,7 +175,7 @@ export default function StudentsPage() {
                                         </div>
                                     </div>
                                     <button className="text-xs font-bold text-slate-400 hover:text-accent transition-colors flex items-center gap-2 uppercase tracking-widest">
-                                        Modular Analytics
+                                        View Analytics
                                         <ChevronDown size={14} className="-rotate-90" />
                                     </button>
                                 </div>
@@ -248,6 +247,5 @@ export default function StudentsPage() {
                     </div>
                 )}
             </div>
-        </DashboardShell>
     );
 }

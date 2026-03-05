@@ -114,18 +114,17 @@ export default function CoursesPage() {
     );
 
     return (
-        <DashboardShell role="instructor">
-            <div className="space-y-8 max-w-[1200px] mx-auto">
-                {/* Governance Header */}
+        <div className="space-y-8 max-w-[1200px] mx-auto">
+                {/* Page Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
                         <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
                             <Layers size={14} className="text-accent" />
-                            <span>Faculty Registry • Course Portfolio</span>
+                            <span>Course Management</span>
                         </div>
-                        <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">Institutional Curriculum</h1>
+                        <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">My Courses</h1>
                         <p className="text-sm text-slate-500 mt-1">
-                            Managing <span className="text-accent font-bold">{courses.length} Active Instructional Modules</span> within the registry.
+                            Managing <span className="text-accent font-bold">{courses.length} active courses</span> across your portfolio.
                         </p>
                     </div>
                     <button
@@ -133,7 +132,7 @@ export default function CoursesPage() {
                         className="px-6 py-3 bg-accent text-white rounded-xl text-sm font-bold shadow-lg border border-slate-700 hover:bg-slate-800 transition-all flex items-center gap-2 self-start"
                     >
                         <Plus size={18} />
-                        Register New Module
+                        Create Course
                     </button>
                 </div>
 
@@ -147,7 +146,7 @@ export default function CoursesPage() {
                     </div>
                 )}
 
-                {/* Tactical Search Row */}
+                {/* Search Row */}
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                     <div className="relative flex-1 group w-full">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-accent transition-colors" size={18} />
@@ -155,29 +154,29 @@ export default function CoursesPage() {
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Scan course registry by code or title..."
+                            placeholder="Search courses by code or title..."
                             className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-accent transition-all shadow-sm"
                         />
                     </div>
                     <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all bg-white shadow-sm">
                         <Filter size={16} />
-                        Matrix Filter
+                        Filter
                     </button>
                 </div>
 
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-32 space-y-4">
                         <div className="w-12 h-12 border-4 border-slate-200 border-t-accent rounded-full animate-spin" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Synchronizing Registry...</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Loading courses...</span>
                     </div>
                 ) : filtered.length === 0 ? (
                     <div className="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-20 text-center hover:bg-slate-50/50 transition-all flex flex-col items-center group cursor-pointer" onClick={openCreate}>
                         <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-300 mb-6 group-hover:scale-110 group-hover:bg-accent group-hover:text-white transition-all duration-300">
                             <BookOpen size={32} />
                         </div>
-                        <h4 className="text-base font-bold text-primary-text uppercase tracking-widest">{search ? "No Matches Identified" : "Institutional Void"}</h4>
+                        <h4 className="text-base font-bold text-primary-text uppercase tracking-widest">{search ? "No Results Found" : "No Courses Yet"}</h4>
                         <p className="text-xs text-slate-400 max-w-xs mx-auto mt-2 italic font-medium">
-                            {search ? `Your query "${search}" did not return any results from the registry.` : "No active instructional modules found. Initialize your first engagement."}
+                            {search ? `Your search "${search}" did not return any results.` : "Create your first course to get started."}
                         </p>
                     </div>
                 ) : (
@@ -197,22 +196,22 @@ export default function CoursesPage() {
 
                                     <h3 className="text-lg font-bold text-primary-text mb-1 tracking-tight group-hover:text-accent transition-colors">{course.code}: {course.title}</h3>
                                     <p className="text-xs text-slate-500 line-clamp-2 italic font-medium leading-relaxed mb-6">
-                                        {course.description || "Instructional parameters not yet defined in the registry description vector."}
+                                        {course.description || "No description provided."}
                                     </p>
 
                                     <div className="flex items-center gap-6">
                                         <div className="flex flex-col">
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Enrolled Cohort</span>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Enrolled</span>
                                             <div className="flex items-center gap-1.5">
                                                 <Users size={14} className="text-accent" />
                                                 <span className="text-sm font-bold text-primary-text tracking-tighter">{course.student_count} Students</span>
                                             </div>
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Analytics Index</span>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Performance</span>
                                             <div className="flex items-center gap-1.5">
                                                 <Zap size={14} className="text-amber-500" />
-                                                <span className="text-sm font-bold text-primary-text tracking-tighter">Elite</span>
+                                                <span className="text-sm font-bold text-primary-text tracking-tighter">Good</span>
                                             </div>
                                         </div>
                                     </div>
@@ -243,7 +242,7 @@ export default function CoursesPage() {
                     </div>
                 )}
 
-                {/* Modal Governance */}
+                {/* Course Modal */}
                 {showModal && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setShowModal(false)}>
                         <div className="bg-white rounded-3xl p-8 w-full max-w-lg shadow-2xl border border-slate-200 relative overflow-hidden" onClick={(e) => e.stopPropagation()}>
@@ -259,15 +258,15 @@ export default function CoursesPage() {
                                     {editingCourse ? <Edit2 size={24} /> : <Plus size={24} />}
                                 </div>
                                 <div className="min-w-0">
-                                    <h3 className="text-xl font-bold text-primary-text tracking-tight mb-1">{editingCourse ? "Modify Course Parameters" : "Registry New Instructional Module"}</h3>
-                                    <p className="text-xs text-slate-500 uppercase tracking-widest font-bold truncate">Synchronizing with Global Educational Schema V4.0</p>
+                                    <h3 className="text-xl font-bold text-primary-text tracking-tight mb-1">{editingCourse ? "Edit Course" : "Create New Course"}</h3>
+                                    <p className="text-xs text-slate-500 uppercase tracking-widest font-bold truncate">Enter course details below</p>
                                 </div>
                             </div>
 
                             <form onSubmit={handleSave} className="space-y-6">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Module Code</label>
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Course Code</label>
                                         <input
                                             type="text"
                                             value={formCode}
@@ -278,21 +277,21 @@ export default function CoursesPage() {
                                         />
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Module Status</label>
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Status</label>
                                         <select
                                             value={formStatus}
                                             onChange={(e) => setFormStatus(e.target.value)}
                                             className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all appearance-none"
                                         >
-                                            <option value="active">Active Execution</option>
-                                            <option value="draft">Internal Draft</option>
-                                            <option value="archived">Archived State</option>
+                                            <option value="active">Active</option>
+                                            <option value="draft">Draft</option>
+                                            <option value="archived">Archived</option>
                                         </select>
                                     </div>
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Full Instructional Title</label>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Course Title</label>
                                     <input
                                         type="text"
                                         value={formTitle}
@@ -304,12 +303,12 @@ export default function CoursesPage() {
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Institutional Description Vector</label>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Description</label>
                                     <textarea
                                         value={formDesc}
                                         onChange={(e) => setFormDesc(e.target.value)}
                                         className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all resize-none italic"
-                                        placeholder="Define the scope and instructional objectives of this module..."
+                                        placeholder="Describe the scope and objectives of this course..."
                                         rows={3}
                                     />
                                 </div>
@@ -320,14 +319,14 @@ export default function CoursesPage() {
                                         onClick={() => setShowModal(false)}
                                         className="flex-1 py-3.5 bg-slate-50 text-slate-500 rounded-xl text-xs font-bold hover:bg-slate-100 transition-all uppercase tracking-[0.2em]"
                                     >
-                                        Abort
+                                        Cancel
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={saving}
                                         className="flex-1 py-3.5 bg-accent text-white rounded-xl text-xs font-bold shadow-lg border border-slate-700 hover:bg-slate-800 transition-all flex items-center justify-center gap-2 disabled:opacity-50 uppercase tracking-[0.2em]"
                                     >
-                                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : editingCourse ? "Commit Changes" : "Execute Creation"}
+                                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : editingCourse ? "Save Changes" : "Create Course"}
                                     </button>
                                 </div>
                             </form>
@@ -335,6 +334,5 @@ export default function CoursesPage() {
                     </div>
                 )}
             </div>
-        </DashboardShell>
     );
 }

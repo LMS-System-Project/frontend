@@ -38,7 +38,7 @@ export default function SignupPage() {
             console.log("Registration: Success, data returned:", data);
 
             // Role-based redirection on success
-            const userRole = data.role || data.user?.role || formData.role;
+            const userRole = data.user?.role || data.role || formData.role;
             let targetPath = "/student/dashboard";
 
             if (userRole === "instructor" || userRole === "teacher") {
@@ -103,7 +103,7 @@ export default function SignupPage() {
                     {/* Email */}
                     <div>
                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" htmlFor="email">
-                            Institutional Email
+                            Email Address
                         </label>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">

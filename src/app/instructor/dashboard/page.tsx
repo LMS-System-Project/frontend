@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import DashboardShell from "@/components/dashboard/DashboardShell";
 import {
   Users,
   BookOpen,
@@ -34,10 +33,17 @@ export default function InstructorDashboard() {
   const [showCreate, setShowCreate] = useState(false);
   const [courses, setCourses] = useState<any[]>([]);
   const [stats, setStats] = useState(statHighlights);
+  const [userName, setUserName] = useState("Instructor");
 
   useEffect(() => {
     async function initDashboard() {
       try {
+        // Get the logged-in user's name
+        const user = api.auth.getUser();
+        if (user?.full_name) {
+          setUserName(user.full_name);
+        }
+
         const [courseData, dashboardData] = await Promise.all([
           api.instructor.courses.list(),
           api.instructor.dashboard()
@@ -45,10 +51,10 @@ export default function InstructorDashboard() {
         setCourses(courseData);
         if (dashboardData) {
           setStats([
-            { ...statHighlights[0], val: dashboardData.active_courses },
-            { ...statHighlights[1], val: dashboardData.total_students },
-            { ...statHighlights[2], val: dashboardData.pending_reviews },
-            { ...statHighlights[3], val: dashboardData.avg_attendance },
+            { ...statHighlights[0], val: String(dashboardData.active_courses ?? 0) },
+            { ...statHighlights[1], val: String(dashboardData.total_students ?? 0) },
+            { ...statHighlights[2], val: String(dashboardData.pending_reviews ?? 0) },
+            { ...statHighlights[3], val: dashboardData.avg_attendance || dashboardData.class_average || "N/A" },
           ]);
         }
       } catch (err) {
@@ -66,17 +72,15 @@ export default function InstructorDashboard() {
 
   if (loading) {
     return (
-      <DashboardShell role="instructor">
-        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-          <Loader2 className="w-10 h-10 animate-spin text-accent" />
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Synchronizing Faculty Records...</p>
-        </div>
-      </DashboardShell>
+      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+        <Loader2 className="w-10 h-10 animate-spin text-accent" />
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Loading dashboard...</p>
+      </div>
     );
   }
 
   return (
-    <DashboardShell role="instructor">
+    <>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -87,13 +91,13 @@ export default function InstructorDashboard() {
           <div>
             <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-3">
               <CheckCircle2 size={12} className="text-emerald-500" />
-              <span>Identity Validated • Faculty Access Layer</span>
+              <span>Welcome back</span>
             </div>
             <h1 className="text-4xl font-bold text-primary-text tracking-tight mb-2">
-              {greeting}, <span className="text-accent italic">Professor Varghese.</span>
+              {greeting}, <span className="text-accent italic">{userName}.</span>
             </h1>
             <p className="text-sm text-slate-500 max-w-lg leading-relaxed">
-              Institutional oversight dashboard. You have <span className="text-accent font-bold underline decoration-accent/30">{stats[2].val} urgent reviews</span> pending for the current term.
+              Your teaching dashboard. You have <span className="text-accent font-bold underline decoration-accent/30">{stats[2].val} pending reviews</span> for the current term.
             </p>
           </div>
           <motion.button
@@ -103,7 +107,7 @@ export default function InstructorDashboard() {
             className="inline-flex items-center gap-3 bg-slate-900 text-white px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-black transition-all shadow-xl border border-slate-800"
           >
             <Plus size={16} />
-            Initialize Module
+            Create Course
           </motion.button>
         </div>
 
@@ -121,7 +125,7 @@ export default function InstructorDashboard() {
                 <div className={`w-12 h-12 ${stat.bg} ${stat.color} rounded-xl flex items-center justify-center transition-transform group-hover:rotate-6`}>
                   <stat.icon size={24} />
                 </div>
-                <div className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 italic">Institutional Parity</div>
+                <div className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 italic">On Track</div>
               </div>
               <div className="text-3xl font-bold text-primary-text mb-1 tracking-tighter">{stat.val}</div>
               <div className="text-[10px] font-black text-slate-400 tracking-widest uppercase">{stat.label}</div>
@@ -135,8 +139,8 @@ export default function InstructorDashboard() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-primary-text tracking-tight flex items-center gap-3">
-              Instructional Registry
-              <span className="text-xs font-medium text-slate-400 border border-slate-200 px-2 py-0.5 rounded uppercase tracking-widest">{courses.length} Modules</span>
+              Your Courses
+              <span className="text-xs font-medium text-slate-400 border border-slate-200 px-2 py-0.5 rounded uppercase tracking-widest">{courses.length} Courses</span>
             </h2>
             <div className="flex items-center gap-1 bg-slate-50 p-1.5 rounded-xl border border-slate-200">
               {['Active', 'Drafts', 'Archived'].map((tab) => (
@@ -172,18 +176,18 @@ export default function InstructorDashboard() {
                     {course.title}
                   </h3>
                   <p className="text-xs text-slate-500 italic leading-relaxed line-clamp-2">
-                    {course.description || "Core institutional module focusing on advanced computational patterns and theory."}
+                    {course.description || "Course focusing on advanced computational patterns and theory."}
                   </p>
                   <div className="flex items-center gap-6 mt-8">
                     <div className="flex flex-col">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Cohort Alpha</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Enrolled</span>
                       <div className="flex items-center gap-2">
                         <Users size={14} className="text-accent" />
                         <span className="text-xs font-bold text-slate-700">{course.student_count || course.students} Students</span>
                       </div>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Efficiency Index</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Performance</span>
                       <div className="flex items-center gap-2">
                         <Activity size={14} className="text-emerald-500" />
                         <span className="text-xs font-bold text-emerald-600">+14% Growth</span>
@@ -216,8 +220,8 @@ export default function InstructorDashboard() {
               <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-300 mb-6 group-hover:scale-110 group-hover:bg-accent group-hover:text-white transition-all duration-300">
                 <Plus size={32} />
               </div>
-              <p className="text-base font-bold text-slate-500 uppercase tracking-widest">Initialize New Module</p>
-              <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-[0.2em] font-medium italic">Institutional Approval Req.</p>
+              <p className="text-base font-bold text-slate-500 uppercase tracking-widest">Create New Course</p>
+              <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-[0.2em] font-medium italic">Add a new course to get started</p>
             </motion.div>
           </div>
         </div>
@@ -242,8 +246,8 @@ export default function InstructorDashboard() {
             >
               <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                 <div>
-                  <h3 className="text-xl font-bold text-primary-text tracking-tight uppercase">Draft New Module</h3>
-                  <p className="text-xs text-slate-500 font-medium italic">Faculty curriculum drafting layer</p>
+                  <h3 className="text-xl font-bold text-primary-text tracking-tight uppercase">Create New Course</h3>
+                  <p className="text-xs text-slate-500 font-medium italic">Add course details below</p>
                 </div>
                 <button
                   onClick={() => setShowCreate(false)}
@@ -254,26 +258,26 @@ export default function InstructorDashboard() {
               </div>
               <div className="p-8 space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Module Code Reference</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Course Code</label>
                   <input type="text" className="w-full px-5 py-3.5 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all shadow-inner" placeholder="e.g. CS 301" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Module Title</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Course Title</label>
                   <input type="text" className="w-full px-5 py-3.5 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all shadow-inner" placeholder="e.g. Distributed Systems" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Instructional Objectives</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Description</label>
                   <textarea className="w-full px-5 py-3.5 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all resize-none shadow-inner" rows={3} placeholder="Define high-level goals..." />
                 </div>
               </div>
               <div className="p-8 bg-slate-50 border-t border-slate-100 flex gap-4">
-                <button onClick={() => setShowCreate(false)} className="flex-1 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest hover:bg-white rounded-xl transition-all border border-transparent hover:border-slate-200">Abort</button>
-                <button className="flex-1 py-4 text-xs font-bold bg-accent text-white rounded-xl shadow-lg border border-slate-700 hover:bg-slate-800 transition-all uppercase tracking-widest">Execute Draft</button>
+                <button onClick={() => setShowCreate(false)} className="flex-1 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest hover:bg-white rounded-xl transition-all border border-transparent hover:border-slate-200">Cancel</button>
+                <button className="flex-1 py-4 text-xs font-bold bg-accent text-white rounded-xl shadow-lg border border-slate-700 hover:bg-slate-800 transition-all uppercase tracking-widest">Create Course</button>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </DashboardShell>
+    </>
   );
 }

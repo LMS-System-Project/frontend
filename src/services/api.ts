@@ -180,4 +180,40 @@ export const api = {
       },
     },
   },
+
+  student: {
+    dashboard: async () => {
+      return apiFetch("/student/dashboard");
+    },
+
+    courses: {
+      list: async () => {
+        return apiFetch("/student/courses");
+      },
+    },
+
+    assignments: {
+      list: async () => {
+        return apiFetch("/student/assignments");
+      },
+      submit: async (assignmentId: string, notes?: string) => {
+        return apiFetch(`/student/assignments/${assignmentId}/submit`, {
+          method: "POST",
+          body: JSON.stringify({ notes }),
+        });
+      },
+    },
+
+    profile: {
+      get: async () => {
+        return apiFetch("/student/profile");
+      },
+      update: async (data: { full_name?: string; department?: string }) => {
+        return apiFetch("/student/profile", {
+          method: "PUT",
+          body: JSON.stringify(data),
+        });
+      },
+    },
+  },
 };

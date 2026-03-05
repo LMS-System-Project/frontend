@@ -85,35 +85,34 @@ export default function SettingsPage() {
     const initials = fullName ? fullName.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase() : "";
 
     return (
-        <DashboardShell role="instructor">
-            <div className="space-y-8 max-w-[1000px] mx-auto pb-20">
-                {/* Governance Header */}
+        <div className="space-y-8 max-w-[1000px] mx-auto pb-20">
+                {/* Header */}
                 <div>
                     <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
                         <SettingsIcon size={14} className="text-accent" />
-                        <span>Faculty Governance • Personal Registry</span>
+                        <span>Account Settings</span>
                     </div>
-                    <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">Governance Parameters</h1>
+                    <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">Profile Settings</h1>
                     <p className="text-sm text-slate-500 mt-1">
-                        Control your <span className="text-accent font-bold">Instructional Identity</span> and institutional visibility vectors.
+                        Manage your <span className="text-accent font-bold">profile information</span> and account preferences.
                     </p>
                 </div>
 
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-32 space-y-4">
                         <div className="w-10 h-10 border-4 border-slate-100 border-t-accent rounded-full animate-spin" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Synchronizing Profile Matrix...</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Loading profile...</span>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                         {/* Sidebar Sections */}
                         <div className="lg:col-span-4 space-y-2">
                             {[
-                                { id: 'personal', label: 'Identity Profile', icon: User, active: true },
-                                { id: 'security', label: 'Security Crypt', icon: Shield, active: false },
-                                { id: 'notifications', label: 'Signal Settings', icon: Bell, active: false },
-                                { id: 'institutional', label: 'Registry Access', icon: Globe, active: false },
-                                { id: 'workflow', label: 'Workflow Engine', icon: Layout, active: false },
+                                { id: 'personal', label: 'Profile', icon: User, active: true },
+                                { id: 'security', label: 'Security', icon: Shield, active: false },
+                                { id: 'notifications', label: 'Notifications', icon: Bell, active: false },
+                                { id: 'permissions', label: 'Permissions', icon: Globe, active: false },
+                                { id: 'workflow', label: 'Preferences', icon: Layout, active: false },
                             ].map((item) => (
                                 <button
                                     key={item.id}
@@ -167,7 +166,7 @@ export default function SettingsPage() {
                                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-6">
                                             <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-lg border border-white/10 text-white/60 text-[10px] font-bold uppercase tracking-widest leading-none">
                                                 <Zap size={10} className="text-amber-500" />
-                                                Elite Sync
+                                                Active
                                             </div>
                                             <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-lg border border-white/10 text-white/60 text-[10px] font-bold uppercase tracking-widest leading-none">
                                                 <Building size={10} className="text-emerald-500" />
@@ -180,7 +179,7 @@ export default function SettingsPage() {
                                 <div className="p-8 space-y-8">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-1.5 flex flex-col">
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Full Instructional Name</label>
+                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Full Name</label>
                                             <input
                                                 value={fullName}
                                                 onChange={(e) => setFullName(e.target.value)}
@@ -188,7 +187,7 @@ export default function SettingsPage() {
                                             />
                                         </div>
                                         <div className="space-y-1.5 flex flex-col">
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Departmental Designation</label>
+                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Department</label>
                                             <input
                                                 value={department}
                                                 onChange={(e) => setDepartment(e.target.value)}
@@ -199,19 +198,19 @@ export default function SettingsPage() {
                                     </div>
 
                                     <div className="space-y-1.5 flex flex-col">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Institutional Email Interface</label>
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Email Address</label>
                                         <input
                                             value={profile?.email || ""}
                                             disabled
                                             className="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-sm font-bold text-slate-400 cursor-not-allowed opacity-60 italic"
                                         />
-                                        <span className="text-[9px] text-slate-300 font-bold uppercase tracking-tighter px-1">* Primary identity vector managed by institution admin.</span>
+                                        <span className="text-[9px] text-slate-300 font-bold uppercase tracking-tighter px-1">* Email is managed by the system administrator.</span>
                                     </div>
 
                                     <div className="pt-6 border-t border-slate-50 flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic">All parameters synchronized with core ledger (12H)</span>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic">Profile saved and up to date</span>
                                         </div>
                                         <button
                                             onClick={handleSave}
@@ -219,7 +218,7 @@ export default function SettingsPage() {
                                             className="px-8 py-3.5 bg-accent text-white rounded-xl text-xs font-bold shadow-lg border border-slate-700 hover:bg-slate-800 transition-all flex items-center gap-2 disabled:opacity-50 uppercase tracking-[0.2em]"
                                         >
                                             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save size={16} />}
-                                            Commit Change Ledger
+                                            Save Changes
                                         </button>
                                     </div>
                                 </div>
@@ -236,7 +235,7 @@ export default function SettingsPage() {
                                     </div>
                                     <div>
                                         <h4 className="text-white text-sm font-bold uppercase tracking-widest mb-1 italic">Security Encryption</h4>
-                                        <p className="text-[10px] text-slate-500 font-medium leading-relaxed italic">Manage dual-factor authentication and session trajectory logs.</p>
+                                        <p className="text-[10px] text-slate-500 font-medium leading-relaxed italic">Manage dual-factor authentication and session logs.</p>
                                     </div>
                                 </div>
                                 <div className="bg-white border border-slate-200 p-6 rounded-2xl group flex flex-col justify-between hover:border-accent/50 transition-all shadow-sm">
@@ -247,8 +246,8 @@ export default function SettingsPage() {
                                         <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Global Opt</span>
                                     </div>
                                     <div>
-                                        <h4 className="text-primary-text text-sm font-bold uppercase tracking-widest mb-1 italic">Atmospheric Design</h4>
-                                        <p className="text-[10px] text-slate-400 font-medium leading-relaxed italic">Switch between Dark/High-Contrast/Elite institutional aesthetics.</p>
+                                        <h4 className="text-primary-text text-sm font-bold uppercase tracking-widest mb-1 italic">Theme Settings</h4>
+                                        <p className="text-[10px] text-slate-400 font-medium leading-relaxed italic">Switch between light and dark mode appearances.</p>
                                     </div>
                                 </div>
                             </div>
@@ -256,6 +255,5 @@ export default function SettingsPage() {
                     </div>
                 )}
             </div>
-        </DashboardShell>
     );
 }

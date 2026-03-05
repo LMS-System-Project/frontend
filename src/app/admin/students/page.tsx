@@ -64,7 +64,7 @@ const students = [
 const RISK_THEMES: Record<string, { label: string; color: string; bg: string; icon: any }> = {
     High: { label: "CRITICAL RISK", color: "text-red-600", bg: "bg-red-50 border-red-100", icon: AlertTriangle },
     Medium: { label: "MODERATE", color: "text-amber-600", bg: "bg-amber-50 border-amber-100", icon: Activity },
-    Low: { label: "NOMINAL", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-100", icon: CheckCircle },
+    Low: { label: "LOW RISK", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-100", icon: CheckCircle },
 };
 
 export default function AdminStudentsPage() {
@@ -88,18 +88,18 @@ export default function AdminStudentsPage() {
     return (
         <DashboardShell role="admin">
             <div className="space-y-8 max-w-[1200px] mx-auto pb-20">
-                {/* Institutional Header */}
+                {/* Page Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
                     <div>
                         <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-3">
                             <Users size={14} className="text-accent" />
-                            <span>System Governance • Global Student Registry</span>
+                            <span>User Management • Student Directory</span>
                         </div>
                         <h1 className="text-4xl font-bold text-primary-text tracking-tight font-serif">
-                            Institutional Registry
+                            Student Directory
                         </h1>
                         <p className="text-sm text-slate-500 mt-2 max-w-md leading-relaxed">
-                            Complete governance of academic vectors across <span className="text-accent font-bold">{students.length} Synchronized Profiles</span> within the GradeFlow infrastructure.
+                            Managing <span className="text-accent font-bold">{students.length} student profiles</span> across all departments.
                         </p>
                     </div>
                     <div className="flex gap-4">
@@ -132,7 +132,7 @@ export default function AdminStudentsPage() {
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Scan institutional registry by name, enrolment, or department..."
+                            placeholder="Search by name, enrollment ID, or department..."
                             className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-accent transition-all shadow-sm"
                         />
                     </div>
@@ -144,13 +144,13 @@ export default function AdminStudentsPage() {
                     </select>
                 </div>
 
-                {/* Registry Table */}
+                {/* Student Table */}
                 <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm border-b-4 border-b-slate-100">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
                                 <tr className="bg-slate-50/50 border-b border-slate-200">
-                                    {["Profile", "Registry ID", "Academic Unit", "Year", "GPA Index", "Risk Vector", "Stability", ""].map((h, i) => (
+                                    {["Profile", "Student ID", "Department", "Year", "GPA", "Risk Level", "Status", ""].map((h, i) => (
                                         <th key={i} className="text-left px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                                             {h}
                                         </th>
@@ -224,7 +224,7 @@ export default function AdminStudentsPage() {
                                                             <div className="flex items-center justify-between">
                                                                 <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
                                                                     <TrendingUp size={12} className="text-accent" />
-                                                                    Academic Velocity
+                                                                    GPA Trajectory
                                                                 </h4>
                                                                 <span className="text-[10px] font-bold text-accent italic">Trending Positive</span>
                                                             </div>
@@ -258,7 +258,7 @@ export default function AdminStudentsPage() {
                                                         <div className="space-y-6">
                                                             <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
                                                                 <Activity size={12} className="text-slate-500" />
-                                                                Institutional Logs
+                                                                Recent Activity
                                                             </h4>
                                                             <div className="space-y-4">
                                                                 {student.activity.map((act, idx) => (
@@ -270,27 +270,27 @@ export default function AdminStudentsPage() {
                                                             </div>
                                                         </div>
 
-                                                        {/* Governance Directives */}
+                                                        {/* Admin Actions */}
                                                         <div className="space-y-6">
                                                             <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
                                                                 <ShieldCheck size={12} className="text-emerald-500" />
-                                                                Governance Directives
+                                                                Admin Actions
                                                             </h4>
                                                             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                                                                 {student.risk === "High" ? (
                                                                     <div className="space-y-4">
                                                                         <div className="flex items-center gap-2 text-red-600">
                                                                             <AlertTriangle size={15} />
-                                                                            <span className="text-[10px] font-black uppercase tracking-widest">Protocol Required</span>
+                                                                            <span className="text-[10px] font-black uppercase tracking-widest">Action Required</span>
                                                                         </div>
                                                                         <ul className="space-y-3">
                                                                             <li className="text-[11px] font-bold text-slate-500 flex items-center gap-3">
                                                                                 <div className="w-1 h-1 rounded-full bg-red-400" />
-                                                                                DELEGATE TO ACADEMIC COUNSEL
+                                                                                REFER TO ACADEMIC ADVISOR
                                                                             </li>
                                                                             <li className="text-[11px] font-bold text-slate-500 flex items-center gap-3">
                                                                                 <div className="w-1 h-1 rounded-full bg-red-400" />
-                                                                                INITIATE MODULE SYNC
+                                                                                SCHEDULE COURSE REVIEW
                                                                             </li>
                                                                         </ul>
                                                                     </div>
@@ -299,8 +299,8 @@ export default function AdminStudentsPage() {
                                                                         <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 mb-3 border border-emerald-100">
                                                                             <CheckCircle size={24} />
                                                                         </div>
-                                                                        <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.1em]">Trajectory Validated</p>
-                                                                        <p className="text-[10px] text-slate-400 font-medium italic mt-1.5 leading-snug">Governance status: Minimal intervention</p>
+                                                                        <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.1em]">On Track</p>
+                                                                        <p className="text-[10px] text-slate-400 font-medium italic mt-1.5 leading-snug">Status: No intervention needed</p>
                                                                     </div>
                                                                 )}
                                                             </div>
@@ -309,7 +309,7 @@ export default function AdminStudentsPage() {
 
                                                     <div className="mt-12 pt-8 border-t border-slate-200 flex items-center justify-end gap-5">
                                                         <button className="px-6 py-2.5 bg-white border border-slate-300 rounded-xl text-[10px] font-bold text-slate-500 hover:text-accent hover:border-accent hover:bg-accent/5 transition-all uppercase tracking-[0.15em] shadow-sm">
-                                                            Institutional Dossier
+                                                            View Full Profile
                                                         </button>
                                                         <button className="px-6 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-[10px] font-bold text-white hover:bg-black transition-all uppercase tracking-[0.15em] shadow-lg">
                                                             Modify Credentials
@@ -324,10 +324,10 @@ export default function AdminStudentsPage() {
                         </table>
                     </div>
 
-                    {/* Registry Pagination */}
+                    {/* Pagination */}
                     <div className="px-8 py-6 bg-slate-50 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
-                            Synchronized Registry Entry <span className="text-primary-text">{filtered.length}</span> of <span className="text-primary-text">189</span> Global Clusters
+                            Showing <span className="text-primary-text">{filtered.length}</span> of <span className="text-primary-text">189</span> total students
                         </p>
                         <div className="flex gap-2">
                             {["01", "02", "03", "...", "99"].map((p, i) => (

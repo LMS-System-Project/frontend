@@ -40,7 +40,7 @@ const tiers = [
         title: "Super Admin",
         icon: Shield,
         color: "bg-slate-900 text-white",
-        description: "Full institutional control and system governance.",
+        description: "Full platform administration and system management.",
         features: [
             "Full Database & Audit Control",
             "Task Assignment for Teachers",

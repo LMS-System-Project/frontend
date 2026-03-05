@@ -6,7 +6,7 @@ import { Download, FileText, BarChart2, Calendar, Filter } from "lucide-react";
 const REPORT_TYPES = [
     { id: "student-performance", label: "Student Performance Report", desc: "Individual grades, CGPA, attendance across departments", icon: BarChart2 },
     { id: "department-summary", label: "Department Summary", desc: "Aggregate stats, GPA averages, course completion rates", icon: FileText },
-    { id: "university-report", label: "University Annual Report", desc: "Full institutional report for governing bodies", icon: FileText },
+    { id: "university-report", label: "University Annual Report", desc: "Full annual report for governing bodies", icon: FileText },
     { id: "drop-risk", label: "At-Risk Student Report", desc: "All students flagged by AI drop-risk predictor", icon: BarChart2 },
     { id: "instructor-performance", label: "Instructor Performance", desc: "Course ratings, student feedback, outcomes", icon: BarChart2 },
 ];

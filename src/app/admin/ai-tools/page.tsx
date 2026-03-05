@@ -46,16 +46,16 @@ export default function AdminAIToolsPage() {
     return (
         <DashboardShell role="admin">
             <div className="space-y-8 max-w-[1200px] mx-auto pb-20">
-                {/* Governance Header */}
+                {/* Page Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
                         <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
                             <Brain size={14} className="text-accent" />
                             <span>System Intelligence • AI Verification Tools</span>
                         </div>
-                        <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">Institutional Cognition</h1>
+                        <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">AI Tools</h1>
                         <p className="text-sm text-slate-500 mt-1">
-                            Governance of <span className="text-accent font-bold italic">AI Ethics</span> and synthetic academic oversight vectors.
+                            Manage <span className="text-accent font-bold italic">AI-assisted grading</span>, anomaly detection, and academic integrity checks.
                         </p>
                     </div>
                     <div className="flex gap-4">
@@ -74,9 +74,9 @@ export default function AdminAIToolsPage() {
                 {/* AI Tactical Status Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {[
-                        { label: "AI Grading Unit", status: "Operational", icon: Brain, color: "text-accent", bg: "bg-accent/5", sub: "12 Enqueued Assets" },
+                        { label: "AI Grading Unit", status: "Operational", icon: Brain, color: "text-accent", bg: "bg-accent/5", sub: "12 Pending Reviews" },
                         { label: "Fraud Detection", status: "Active Scan", icon: ShieldAlert, color: "text-red-500", bg: "bg-red-50", sub: "02 Flags Identified" },
-                        { label: "Anomaly Matrix", status: "Nominal", icon: BarChart3, color: "text-amber-500", bg: "bg-amber-50", sub: "03 Vectors Tracked" },
+                        { label: "Anomaly Detection", status: "Healthy", icon: BarChart3, color: "text-amber-500", bg: "bg-amber-50", sub: "03 Items Tracked" },
                     ].map((tool, i) => (
                         <div key={i} className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm hover:shadow-sharp transition-all group border-b-4 border-b-slate-100 hover:border-b-accent">
                             <div className="flex items-center justify-between mb-4">
@@ -104,7 +104,7 @@ export default function AdminAIToolsPage() {
                                         <Zap size={14} className="text-accent" />
                                         Synthetic Evaluation Queue
                                     </h3>
-                                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1 italic">Final Institutional Verification Required</p>
+                                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1 italic">Review Required Before Finalizing</p>
                                 </div>
                                 <button className="text-[10px] font-black text-slate-400 hover:text-accent uppercase tracking-widest transition-colors">Bulk Audit</button>
                             </div>
@@ -124,7 +124,7 @@ export default function AdminAIToolsPage() {
                                         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                                             <div className="space-y-4 flex-1 max-w-xs">
                                                 <div className="flex items-center justify-between">
-                                                    <span className="text-[9px] font-black text-accent uppercase tracking-widest">Cognitive Score: {item.aiGrade}</span>
+                                                    <span className="text-[9px] font-black text-accent uppercase tracking-widest">AI Grade: {item.aiGrade}</span>
                                                     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic">{item.confidence}% Conf.</span>
                                                 </div>
                                                 <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
@@ -135,8 +135,8 @@ export default function AdminAIToolsPage() {
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">
-                                                <button className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-[9px] font-black text-slate-400 hover:text-accent hover:border-accent hover:shadow-sharp transition-all uppercase tracking-widest whitespace-nowrap">Audit Response</button>
-                                                <button className="px-4 py-2 bg-slate-900 border border-slate-800 rounded-lg text-[9px] font-black text-white hover:bg-black transition-all shadow-lg uppercase tracking-widest whitespace-nowrap">Commit Grade</button>
+                                                <button className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-[9px] font-black text-slate-400 hover:text-accent hover:border-accent hover:shadow-sharp transition-all uppercase tracking-widest whitespace-nowrap">Review Details</button>
+                                                <button className="px-4 py-2 bg-slate-900 border border-slate-800 rounded-lg text-[9px] font-black text-white hover:bg-black transition-all shadow-lg uppercase tracking-widest whitespace-nowrap">Approve Grade</button>
                                             </div>
                                         </div>
                                     </div>
@@ -144,7 +144,7 @@ export default function AdminAIToolsPage() {
                             </div>
                             <div className="p-4 bg-slate-50 text-center border-t border-slate-100">
                                 <button className="text-[10px] font-black text-slate-400 hover:text-accent uppercase tracking-widest flex items-center justify-center gap-2 mx-auto">
-                                    Expand Queue Repository
+                                    View All Pending
                                     <ChevronRight size={14} />
                                 </button>
                             </div>
@@ -178,7 +178,7 @@ export default function AdminAIToolsPage() {
                             </div>
                         </div>
 
-                        {/* Plagiarism & Fraud Registry */}
+                        {/* Plagiarism & Fraud Detection */}
                         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm border-b-4 border-b-red-50">
                             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                                 <h3 className="text-[10px] font-black text-red-600 uppercase tracking-widest flex items-center gap-2 italic">
