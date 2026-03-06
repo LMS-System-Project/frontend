@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import DashboardShell from "@/components/dashboard/DashboardShell";
-import { api } from "@/services/api";
+import { api, resolveFileUrl } from "@/services/api";
 import {
     GraduationCap,
     Plus,
@@ -279,7 +279,7 @@ export default function GradingPage() {
                                                 <td className="px-6 py-4">
                                                     {sub.file_url ? (
                                                         <a
-                                                            href={sub.file_url.startsWith("http") ? sub.file_url : `http://localhost:8001${sub.file_url}`}
+                                                            href={resolveFileUrl(sub.file_url)}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="flex items-center gap-1.5 text-[10px] font-bold text-accent hover:underline"

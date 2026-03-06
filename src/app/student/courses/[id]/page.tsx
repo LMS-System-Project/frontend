@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { api } from "@/services/api";
+import { api, resolveFileUrl } from "@/services/api";
 
 export default function CourseDetailPage() {
     const params = useParams();
@@ -205,7 +205,7 @@ export default function CourseDetailPage() {
                                     </div>
                                 </div>
                                 <a
-                                    href={mat.file_url.startsWith("http") ? mat.file_url : `http://localhost:8001${mat.file_url}`}
+                                    href={resolveFileUrl(mat.file_url)}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="px-4 py-2.5 bg-accent text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-opacity flex items-center gap-2 flex-shrink-0"

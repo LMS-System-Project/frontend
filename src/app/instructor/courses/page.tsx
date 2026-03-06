@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import DashboardShell from "@/components/dashboard/DashboardShell";
-import { api } from "@/services/api";
+import { api, resolveFileUrl } from "@/services/api";
 import {
     BookOpen,
     Plus,
@@ -435,7 +435,7 @@ export default function CoursesPage() {
                                                                     <p className="text-[10px] text-slate-400">{mat.file_name} • {formatSize(mat.file_size)}</p>
                                                                 </div>
                                                                 <a
-                                                                    href={mat.file_url.startsWith("http") ? mat.file_url : `http://localhost:8001${mat.file_url}`}
+                                                                    href={resolveFileUrl(mat.file_url)}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
                                                                     className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-accent rounded-lg hover:bg-slate-50 transition-all"

@@ -1,5 +1,16 @@
 const API_BASE = "/api";
 
+/**
+ * Resolve a file URL to an absolute URL.
+ * - If the URL is already absolute (http/https), return as-is.
+ * - Otherwise, prepend the backend origin (NEXT_PUBLIC_API_URL or localhost fallback).
+ */
+export function resolveFileUrl(fileUrl: string): string {
+  if (fileUrl.startsWith("http")) return fileUrl;
+  const backendOrigin = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001";
+  return `${backendOrigin}${fileUrl}`;
+}
+
 // ── Token helpers ──────────────────────────────────────────────
 
 function getToken(): string | null {
