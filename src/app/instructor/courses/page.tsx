@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import { api } from "@/services/api";
@@ -13,15 +13,18 @@ import {
     Trash2,
     Search,
     Users,
-    MoreHorizontal,
     Filter,
-    ChevronDown,
     Layers,
-    Target,
     Zap,
     ShieldCheck,
-    CheckCircle2
+    Upload,
+    FileText,
+    Download,
+    ChevronDown,
+    ChevronUp,
+    File as FileIcon,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Course {
     id: string;
@@ -30,6 +33,23 @@ interface Course {
     description: string | null;
     status: string;
     student_count: number;
+}
+
+interface Material {
+    id: string;
+    title: string;
+    description?: string;
+    file_name: string;
+    file_url: string;
+    file_size: number;
+    created_at?: string;
+}
+
+function formatSize(bytes: number): string {
+    if (!bytes) return "";
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 export default function CoursesPage() {
@@ -48,6 +68,17 @@ export default function CoursesPage() {
     const [formStatus, setFormStatus] = useState("active");
     const [saving, setSaving] = useState(false);
 
+    // Materials panel
+    const [expandedCourseId, setExpandedCourseId] = useState<string | null>(null);
+    const [materials, setMaterials] = useState<Record<string, Material[]>>({});
+    const [materialsLoading, setMaterialsLoading] = useState<string | null>(null);
+    const [uploadingFor, setUploadingFor] = useState<string | null>(null);
+    const [matTitle, setMatTitle] = useState("");
+    const [matDesc, setMatDesc] = useState("");
+    const [matFile, setMatFile] = useState<File | null>(null);
+    const [showUploadFor, setShowUploadFor] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
     useEffect(() => {
         if (!api.auth.getToken()) { router.push("/login"); return; }
         fetchCourses();
@@ -62,6 +93,55 @@ export default function CoursesPage() {
             setError(err.message || "Failed to load courses");
         } finally {
             setLoading(false);
+        }
+    }
+
+    async function toggleMaterials(courseId: string) {
+        if (expandedCourseId === courseId) {
+            setExpandedCourseId(null);
+            return;
+        }
+        setExpandedCourseId(courseId);
+        if (!materials[courseId]) {
+            setMaterialsLoading(courseId);
+            try {
+                const data = await api.instructor.materials.list(courseId);
+                setMaterials(prev => ({ ...prev, [courseId]: data || [] }));
+            } catch (err: any) {
+                setError(err.message || "Failed to load materials");
+            } finally {
+                setMaterialsLoading(null);
+            }
+        }
+    }
+
+    async function handleUploadMaterial(courseId: string) {
+        if (!matFile || !matTitle.trim()) return;
+        setUploadingFor(courseId);
+        try {
+            await api.instructor.materials.upload(courseId, matFile, matTitle, matDesc || undefined);
+            // Refresh materials
+            const data = await api.instructor.materials.list(courseId);
+            setMaterials(prev => ({ ...prev, [courseId]: data || [] }));
+            setShowUploadFor(null);
+            setMatTitle(""); setMatDesc(""); setMatFile(null);
+        } catch (err: any) {
+            setError(err.message || "Failed to upload material");
+        } finally {
+            setUploadingFor(null);
+        }
+    }
+
+    async function handleDeleteMaterial(courseId: string, materialId: string) {
+        if (!confirm("Delete this material? This cannot be undone.")) return;
+        try {
+            await api.instructor.materials.delete(materialId);
+            setMaterials(prev => ({
+                ...prev,
+                [courseId]: (prev[courseId] || []).filter(m => m.id !== materialId),
+            }));
+        } catch (err: any) {
+            setError(err.message || "Failed to delete material");
         }
     }
 
@@ -124,7 +204,7 @@ export default function CoursesPage() {
                         </div>
                         <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">My Courses</h1>
                         <p className="text-sm text-slate-500 mt-1">
-                            Managing <span className="text-accent font-bold">{courses.length} active courses</span> across your portfolio.
+                            Managing <span className="text-accent font-bold">{courses.length} courses</span> in your portfolio.
                         </p>
                     </div>
                     <button
@@ -140,7 +220,7 @@ export default function CoursesPage() {
                     <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-bold flex justify-between animate-in slide-in-from-top duration-300">
                         <div className="flex items-center gap-2">
                             <ShieldCheck size={14} />
-                            {error.toUpperCase()}
+                            {error}
                         </div>
                         <button onClick={() => setError("")} className="text-red-400 hover:text-red-600 transition-colors">✕</button>
                     </div>
@@ -180,46 +260,47 @@ export default function CoursesPage() {
                         </p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="space-y-4">
                         {filtered.map((course) => (
-                            <div key={course.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-sharp transition-all group flex flex-col border-b-4 border-b-slate-100 hover:border-b-accent">
-                                <div className="p-6 flex-1">
-                                    <div className="flex items-center justify-between mb-6">
-                                        <div className="w-10 h-10 bg-accent text-white rounded flex items-center justify-center text-xs font-black shadow-lg border border-slate-700">
-                                            {course.code.substring(0, 4).toUpperCase()}
-                                        </div>
-                                        <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-slate-50 border border-slate-100">
-                                            <div className={`w-1.5 h-1.5 rounded-full ${course.status === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-                                            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none">{course.status}</span>
-                                        </div>
+                            <div key={course.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+                                {/* Course Row */}
+                                <div className="p-6 flex flex-col md:flex-row md:items-center gap-4">
+                                    <div className="w-10 h-10 bg-accent text-white rounded-lg flex items-center justify-center text-xs font-black shadow border border-slate-700 flex-shrink-0">
+                                        {course.code.substring(0, 4).toUpperCase()}
                                     </div>
-
-                                    <h3 className="text-lg font-bold text-primary-text mb-1 tracking-tight group-hover:text-accent transition-colors">{course.code}: {course.title}</h3>
-                                    <p className="text-xs text-slate-500 line-clamp-2 italic font-medium leading-relaxed mb-6">
-                                        {course.description || "No description provided."}
-                                    </p>
-
-                                    <div className="flex items-center gap-6">
-                                        <div className="flex flex-col">
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Enrolled</span>
-                                            <div className="flex items-center gap-1.5">
-                                                <Users size={14} className="text-accent" />
-                                                <span className="text-sm font-bold text-primary-text tracking-tighter">{course.student_count} Students</span>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <h3 className="text-sm font-bold text-primary-text tracking-tight">{course.code}: {course.title}</h3>
+                                            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-50 border border-slate-100">
+                                                <div className={`w-1.5 h-1.5 rounded-full ${course.status === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+                                                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none">{course.status}</span>
                                             </div>
                                         </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Performance</span>
+                                        <p className="text-xs text-slate-400 mt-1 italic truncate">{course.description || "No description provided."}</p>
+                                        <div className="flex items-center gap-4 mt-2">
                                             <div className="flex items-center gap-1.5">
-                                                <Zap size={14} className="text-amber-500" />
-                                                <span className="text-sm font-bold text-primary-text tracking-tighter">Good</span>
+                                                <Users size={12} className="text-accent" />
+                                                <span className="text-xs font-bold text-slate-500">{course.student_count} students</span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5">
+                                                <FileText size={12} className="text-slate-400" />
+                                                <span className="text-xs text-slate-400">{(materials[course.id] || []).length} materials</span>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Modified: 12H AGO</span>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                        <button
+                                            onClick={() => toggleMaterials(course.id)}
+                                            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all border ${
+                                                expandedCourseId === course.id
+                                                    ? "bg-accent text-white border-slate-700"
+                                                    : "bg-white text-slate-500 border-slate-200 hover:border-accent hover:text-accent"
+                                            }`}
+                                        >
+                                            <Upload size={12} />
+                                            Materials
+                                            {expandedCourseId === course.id ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                                        </button>
                                         <button
                                             onClick={() => openEdit(course)}
                                             className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-accent hover:border-accent transition-all shadow-sm"
@@ -232,11 +313,151 @@ export default function CoursesPage() {
                                         >
                                             <Trash2 size={14} />
                                         </button>
-                                        <button className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-white hover:bg-black transition-all shadow-sm">
-                                            <MoreHorizontal size={14} />
-                                        </button>
                                     </div>
                                 </div>
+
+                                {/* Materials Panel */}
+                                <AnimatePresence>
+                                    {expandedCourseId === course.id && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: "auto", opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="overflow-hidden border-t border-slate-100"
+                                        >
+                                            <div className="p-6 bg-slate-50/50">
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                                                        Study Materials
+                                                    </h4>
+                                                    <button
+                                                        onClick={() => {
+                                                            setShowUploadFor(showUploadFor === course.id ? null : course.id);
+                                                            setMatTitle(""); setMatDesc(""); setMatFile(null);
+                                                        }}
+                                                        className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-slate-800 transition-all"
+                                                    >
+                                                        <Plus size={12} />
+                                                        Upload Material
+                                                    </button>
+                                                </div>
+
+                                                {/* Upload Form */}
+                                                <AnimatePresence>
+                                                    {showUploadFor === course.id && (
+                                                        <motion.div
+                                                            initial={{ height: 0, opacity: 0 }}
+                                                            animate={{ height: "auto", opacity: 1 }}
+                                                            exit={{ height: 0, opacity: 0 }}
+                                                            className="overflow-hidden mb-4"
+                                                        >
+                                                            <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
+                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                                    <div>
+                                                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Title *</label>
+                                                                        <input
+                                                                            value={matTitle}
+                                                                            onChange={(e) => setMatTitle(e.target.value)}
+                                                                            placeholder="e.g. Lecture 1 Slides"
+                                                                            className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-accent transition-all"
+                                                                        />
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Description</label>
+                                                                        <input
+                                                                            value={matDesc}
+                                                                            onChange={(e) => setMatDesc(e.target.value)}
+                                                                            placeholder="Optional description"
+                                                                            className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-accent transition-all"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">File *</label>
+                                                                    <input
+                                                                        ref={fileInputRef}
+                                                                        type="file"
+                                                                        onChange={(e) => setMatFile(e.target.files?.[0] || null)}
+                                                                        className="hidden"
+                                                                    />
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => fileInputRef.current?.click()}
+                                                                        className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-xs text-slate-400 hover:border-accent hover:text-accent transition-colors text-center"
+                                                                    >
+                                                                        {matFile ? (
+                                                                            <span className="text-accent font-bold">📎 {matFile.name} ({formatSize(matFile.size)})</span>
+                                                                        ) : (
+                                                                            "Click to select a file (PDF, DOC, PPT, etc.)"
+                                                                        )}
+                                                                    </button>
+                                                                </div>
+                                                                <div className="flex gap-3">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => { setShowUploadFor(null); setMatTitle(""); setMatDesc(""); setMatFile(null); }}
+                                                                        className="flex-1 py-2.5 border border-slate-200 rounded-xl text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:bg-slate-50 transition-all"
+                                                                    >
+                                                                        Cancel
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => handleUploadMaterial(course.id)}
+                                                                        disabled={!matFile || !matTitle.trim() || uploadingFor === course.id}
+                                                                        className="flex-1 py-2.5 bg-accent text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-slate-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                                                    >
+                                                                        {uploadingFor === course.id ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                                                                        Upload
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+
+                                                {/* Materials List */}
+                                                {materialsLoading === course.id ? (
+                                                    <div className="flex items-center justify-center py-8">
+                                                        <Loader2 size={20} className="animate-spin text-accent" />
+                                                    </div>
+                                                ) : (materials[course.id] || []).length === 0 ? (
+                                                    <p className="text-xs text-slate-400 text-center py-6 italic">
+                                                        No materials uploaded yet. Click "Upload Material" to add study resources.
+                                                    </p>
+                                                ) : (
+                                                    <div className="space-y-2">
+                                                        {(materials[course.id] || []).map((mat) => (
+                                                            <div key={mat.id} className="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-3">
+                                                                <FileIcon size={16} className="text-accent flex-shrink-0" />
+                                                                <div className="flex-1 min-w-0">
+                                                                    <p className="text-xs font-bold text-primary-text truncate">{mat.title}</p>
+                                                                    <p className="text-[10px] text-slate-400">{mat.file_name} • {formatSize(mat.file_size)}</p>
+                                                                </div>
+                                                                <a
+                                                                    href={mat.file_url.startsWith("http") ? mat.file_url : `http://localhost:8001${mat.file_url}`}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-accent rounded-lg hover:bg-slate-50 transition-all"
+                                                                    title="Download"
+                                                                >
+                                                                    <Download size={13} />
+                                                                </a>
+                                                                <button
+                                                                    onClick={() => handleDeleteMaterial(course.id, mat.id)}
+                                                                    className="w-7 h-7 flex items-center justify-center text-slate-300 hover:text-red-500 rounded-lg hover:bg-red-50 transition-all"
+                                                                    title="Delete"
+                                                                >
+                                                                    <Trash2 size={13} />
+                                                                </button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         ))}
                     </div>
@@ -297,7 +518,7 @@ export default function CoursesPage() {
                                         value={formTitle}
                                         onChange={(e) => setFormTitle(e.target.value)}
                                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all"
-                                        placeholder="Advanced Quantum Computation Models"
+                                        placeholder="e.g. Introduction to Data Structures"
                                         required
                                     />
                                 </div>

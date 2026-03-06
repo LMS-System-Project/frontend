@@ -30,6 +30,9 @@ interface Assignment {
     course_code?: string;
     course_title?: string;
     title: string;
+    description?: string;
+    instructions?: string;
+    max_marks?: number;
     due_date?: string;
     created_at?: string;
 }
@@ -43,6 +46,9 @@ interface Submission {
     student_name?: string;
     status: string;
     grade?: string;
+    file_url?: string;
+    file_name?: string;
+    notes?: string;
     submitted_at?: string;
 }
 
@@ -71,6 +77,9 @@ export default function GradingPage() {
     const [newTitle, setNewTitle] = useState("");
     const [newCourseId, setNewCourseId] = useState("");
     const [newDueDate, setNewDueDate] = useState("");
+    const [newDescription, setNewDescription] = useState("");
+    const [newInstructions, setNewInstructions] = useState("");
+    const [newMaxMarks, setNewMaxMarks] = useState("100");
     const [creating, setCreating] = useState(false);
 
     useEffect(() => {
@@ -118,10 +127,14 @@ export default function GradingPage() {
             await api.instructor.assignments.create({
                 course_id: newCourseId,
                 title: newTitle,
+                description: newDescription || undefined,
+                instructions: newInstructions || undefined,
+                max_marks: newMaxMarks ? parseInt(newMaxMarks) : 100,
                 due_date: newDueDate || undefined,
             });
             setShowCreate(false);
             setNewTitle(""); setNewCourseId(""); setNewDueDate("");
+            setNewDescription(""); setNewInstructions(""); setNewMaxMarks("100");
             fetchAll();
         } catch (err: any) {
             setError(err.message || "Failed to create assignment");
@@ -225,9 +238,10 @@ export default function GradingPage() {
                                         <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Student</th>
                                         <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Assignment</th>
                                         <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Course</th>
-                                        <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Evaluation Status</th>
+                                        <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
+                                        <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Attachment</th>
                                         <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Score</th>
-                                        <th className="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Engagement</th>
+                                        <th className="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-50">
@@ -243,13 +257,15 @@ export default function GradingPage() {
                                                         </div>
                                                         <div>
                                                             <div className="text-xs font-bold text-primary-text tracking-tight">{sub.student_name}</div>
-                                                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Current Term</div>
+                                                            <div className="text-[10px] text-slate-400 font-medium">{sub.submitted_at ? new Date(sub.submitted_at).toLocaleDateString() : "—"}</div>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="text-xs font-bold text-primary-text">{sub.assignment_title}</div>
-                                                    <div className="text-[10px] text-slate-400 font-medium italic">Autumn Cycle</div>
+                                                    {sub.notes && (
+                                                        <div className="text-[10px] text-slate-400 italic mt-0.5 max-w-[180px] truncate" title={sub.notes}>Note: {sub.notes}</div>
+                                                    )}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span className="text-[10px] font-black text-accent py-0.5 px-2 bg-slate-100 rounded border border-slate-200 uppercase">{sub.course_code}</span>
@@ -259,6 +275,22 @@ export default function GradingPage() {
                                                         <Icon size={12} />
                                                         <span className="text-[10px] font-bold uppercase tracking-widest">{theme.label}</span>
                                                     </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {sub.file_url ? (
+                                                        <a
+                                                            href={sub.file_url.startsWith("http") ? sub.file_url : `http://localhost:8001${sub.file_url}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="flex items-center gap-1.5 text-[10px] font-bold text-accent hover:underline"
+                                                            title={sub.file_name}
+                                                        >
+                                                            <FileText size={11} />
+                                                            {sub.file_name ? (sub.file_name.length > 16 ? sub.file_name.substring(0, 16) + "…" : sub.file_name) : "View File"}
+                                                        </a>
+                                                    ) : (
+                                                        <span className="text-[10px] text-slate-300 font-medium">No file</span>
+                                                    )}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     {sub.grade ? (
@@ -294,15 +326,33 @@ export default function GradingPage() {
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {assignments.map((a) => (
-                                <div key={a.id} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-sharp hover:border-accent/30 transition-all group border-b-4 border-b-slate-100 hover:border-b-accent">
-                                    <div className="flex items-center justify-between mb-6">
+                                <div key={a.id} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all group border-b-4 border-b-slate-100 hover:border-b-accent">
+                                    <div className="flex items-center justify-between mb-4">
                                         <div className="text-[10px] font-black text-accent px-2 py-0.5 bg-slate-100 rounded border border-slate-200 uppercase tracking-widest">{a.course_code}</div>
                                         <div className="w-8 h-8 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center group-hover:text-accent transition-colors">
                                             <FileText size={18} />
                                         </div>
                                     </div>
-                                    <h3 className="text-base font-bold text-primary-text tracking-tight mb-4 group-hover:text-accent transition-colors">{a.title}</h3>
-                                    <div className="space-y-4">
+                                    <h3 className="text-base font-bold text-primary-text tracking-tight mb-2 group-hover:text-accent transition-colors">{a.title}</h3>
+                                    {a.description && (
+                                        <p className="text-xs text-slate-500 leading-relaxed mb-3 italic line-clamp-2">{a.description}</p>
+                                    )}
+                                    {a.instructions && (
+                                        <div className="bg-slate-50 rounded-xl p-3 mb-3 border border-slate-100">
+                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Instructions</p>
+                                            <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">{a.instructions}</p>
+                                        </div>
+                                    )}
+                                    <div className="space-y-3">
+                                        {a.max_marks !== undefined && (
+                                            <div className="flex items-center gap-3">
+                                                <Target size={14} className="text-slate-400" />
+                                                <div>
+                                                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Max Marks</div>
+                                                    <div className="text-xs font-bold text-primary-text">{a.max_marks}</div>
+                                                </div>
+                                            </div>
+                                        )}
                                         {a.due_date && (
                                             <div className="flex items-center gap-3">
                                                 <Calendar size={14} className="text-slate-400" />
@@ -320,12 +370,8 @@ export default function GradingPage() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="mt-8 pt-4 border-t border-slate-50 flex items-center justify-between">
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Registered: {new Date(a.created_at || Date.now()).toLocaleDateString()}</span>
-                                        <button className="text-[10px] font-bold text-accent uppercase tracking-widest flex items-center gap-1 hover:gap-2 transition-all group-hover:underline">
-                                            View Details
-                                            <ChevronDown size={14} className="-rotate-90" />
-                                        </button>
+                                    <div className="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between">
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Created: {new Date(a.created_at || Date.now()).toLocaleDateString()}</span>
                                     </div>
                                 </div>
                             ))}
@@ -421,7 +467,7 @@ export default function GradingPage() {
                                 </div>
                             </div>
 
-                            <form onSubmit={(e) => { e.preventDefault(); handleCreateAssignment(); }} className="space-y-6">
+                            <form onSubmit={(e) => { e.preventDefault(); handleCreateAssignment(); }} className="space-y-5">
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Course</label>
                                     <select
@@ -441,19 +487,54 @@ export default function GradingPage() {
                                         value={newTitle}
                                         onChange={(e) => setNewTitle(e.target.value)}
                                         placeholder="e.g. Midterm Exam, Homework 3"
-                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all italic font-medium"
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all font-medium"
                                         required
                                     />
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Due Date</label>
-                                    <input
-                                        type="date"
-                                        value={newDueDate}
-                                        onChange={(e) => setNewDueDate(e.target.value)}
-                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all italic font-medium"
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Description <span className="normal-case text-slate-300">(optional)</span></label>
+                                    <textarea
+                                        value={newDescription}
+                                        onChange={(e) => setNewDescription(e.target.value)}
+                                        placeholder="Brief description of what this assignment covers..."
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all resize-none font-medium"
+                                        rows={2}
                                     />
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Instructions <span className="normal-case text-slate-300">(optional)</span></label>
+                                    <textarea
+                                        value={newInstructions}
+                                        onChange={(e) => setNewInstructions(e.target.value)}
+                                        placeholder="Step-by-step instructions for students..."
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all resize-none font-medium"
+                                        rows={2}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Max Marks</label>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            max="1000"
+                                            value={newMaxMarks}
+                                            onChange={(e) => setNewMaxMarks(e.target.value)}
+                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all font-medium"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Due Date <span className="normal-case text-slate-300">(optional)</span></label>
+                                        <input
+                                            type="date"
+                                            value={newDueDate}
+                                            onChange={(e) => setNewDueDate(e.target.value)}
+                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all font-medium"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="flex gap-4 pt-4">

@@ -53,6 +53,26 @@ async function apiFetch(path: string, options: RequestInit = {}) {
   return res.json();
 }
 
+async function apiFetchFormData(path: string, formData: FormData) {
+  const token = getToken();
+  const headers: any = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  // Do NOT set Content-Type — browser sets it with boundary for multipart/form-data
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    headers,
+    body: formData,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Request failed" }));
+    throw new Error(err.detail || "Request failed");
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
 // ── API Methods ────────────────────────────────────────────────
 
 export const api = {
@@ -147,6 +167,9 @@ export const api = {
       create: async (assignment: {
         course_id: string;
         title: string;
+        description?: string;
+        instructions?: string;
+        max_marks?: number;
         due_date?: string;
       }) => {
         return apiFetch("/instructor/assignments", {
@@ -179,6 +202,24 @@ export const api = {
         });
       },
     },
+
+    materials: {
+      list: async (courseId: string) => {
+        return apiFetch(`/instructor/courses/${courseId}/materials`);
+      },
+      upload: async (courseId: string, file: File, title: string, description?: string) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("title", title);
+        if (description) formData.append("description", description);
+        return apiFetchFormData(`/instructor/courses/${courseId}/materials`, formData);
+      },
+      delete: async (materialId: string) => {
+        return apiFetch(`/instructor/materials/${materialId}`, {
+          method: "DELETE",
+        });
+      },
+    },
   },
 
   student: {
@@ -186,9 +227,22 @@ export const api = {
       return apiFetch("/student/dashboard");
     },
 
+    catalog: async () => {
+      return apiFetch("/student/catalog");
+    },
+
+    enroll: async (courseId: string) => {
+      return apiFetch(`/student/enroll/${courseId}`, {
+        method: "POST",
+      });
+    },
+
     courses: {
       list: async () => {
         return apiFetch("/student/courses");
+      },
+      materials: async (courseId: string) => {
+        return apiFetch(`/student/courses/${courseId}/materials`);
       },
     },
 
@@ -201,6 +255,12 @@ export const api = {
           method: "POST",
           body: JSON.stringify({ notes }),
         });
+      },
+      submitWithFile: async (assignmentId: string, file?: File, notes?: string) => {
+        const formData = new FormData();
+        if (file) formData.append("file", file);
+        if (notes) formData.append("notes", notes);
+        return apiFetchFormData(`/student/assignments/${assignmentId}/submit`, formData);
       },
     },
 
@@ -215,5 +275,36 @@ export const api = {
         });
       },
     },
+
+    ai: {
+      chat: async (message: string) => {
+        return apiFetch("/student/ai/chat", {
+          method: "POST",
+          body: JSON.stringify({ message }),
+        });
+      },
+    },
+
+    career: {
+      jobs: async (query?: string, location?: string) => {
+        const params = new URLSearchParams();
+        if (query) params.set("query", query);
+        if (location) params.set("location", location);
+        const qs = params.toString();
+        return apiFetch(`/student/career/jobs${qs ? `?${qs}` : ""}`);
+      },
+      generateResume: async (data: { target_role?: string; include_skills?: boolean; include_courses?: boolean }) => {
+        return apiFetch("/student/career/generate-resume", {
+          method: "POST",
+          body: JSON.stringify(data),
+        });
+      },
+    },
+
+    collab: {
+      studyGroups: async () => apiFetch("/student/collab/study-groups"),
+      studyPartners: async () => apiFetch("/student/collab/study-partners"),
+    },
   },
 };
+

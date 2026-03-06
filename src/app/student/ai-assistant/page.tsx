@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { api } from "@/services/api";
 import {
     Send,
     Brain,
@@ -42,17 +43,27 @@ const STUDY_PLAN = [
 export default function StudentAIAssistantPage() {
     const [messages, setMessages] = useState(INITIAL_MESSAGES);
     const [input, setInput] = useState("");
+    const [sending, setSending] = useState(false);
     const [activeTab, setActiveTab] = useState<"chat" | "planner" | "advisor">("chat");
+    const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    function sendMessage(text: string) {
-        if (!text.trim()) return;
-        const userMsg = { role: "user", text };
-        const aiResponse = {
-            role: "ai",
-            text: `Analyzing: "${text}"... Based on your academic standing (Top 5%), I recommend focusing on the key concepts in your upcoming CS assignments. Would you like me to create a personalized study plan for these topics?`,
-        };
-        setMessages((prev) => [...prev, userMsg, aiResponse]);
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
+
+    async function sendMessage(text: string) {
+        if (!text.trim() || sending) return;
         setInput("");
+        setSending(true);
+        setMessages((prev) => [...prev, { role: "user", text }]);
+        try {
+            const data = await api.student.ai.chat(text);
+            setMessages((prev) => [...prev, { role: "ai", text: data.response || data.message || "I couldn't generate a response. Please try again." }]);
+        } catch {
+            setMessages((prev) => [...prev, { role: "ai", text: "Connection error. Please check your login and try again." }]);
+        } finally {
+            setSending(false);
+        }
     }
 
     return (
@@ -114,7 +125,7 @@ export default function StudentAIAssistantPage() {
                         </div>
 
                         {/* Message Stream */}
-                        <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-slate-50/30">
+                        <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-slate-50/30" id="chat-messages">
                             {messages.map((msg, i) => (
                                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                     <div className={`flex gap-4 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
@@ -129,6 +140,19 @@ export default function StudentAIAssistantPage() {
                                     </div>
                                 </div>
                             ))}
+                            {sending && (
+                                <div className="flex justify-start">
+                                    <div className="flex gap-4 max-w-[85%]">
+                                        <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-accent flex items-center justify-center flex-shrink-0 mt-1 shadow-sm">
+                                            <Brain size={16} />
+                                        </div>
+                                        <div className="p-4 rounded-xl text-sm bg-white border border-slate-200 text-slate-400 italic">
+                                            Thinking...
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            <div ref={messagesEndRef} />
                         </div>
 
                         {/* Input Hub */}
@@ -151,11 +175,13 @@ export default function StudentAIAssistantPage() {
                                     onChange={(e) => setInput(e.target.value)}
                                     onKeyDown={(e) => e.key === "Enter" && sendMessage(input)}
                                     placeholder="Ask a question..."
-                                    className="flex-1 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all"
+                                    disabled={sending}
+                                    className="flex-1 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent transition-all disabled:opacity-60"
                                 />
                                 <button
                                     onClick={() => sendMessage(input)}
-                                    className="px-5 py-3 bg-accent text-white rounded-xl shadow-lg border border-slate-700 hover:bg-slate-800 transition-all"
+                                    disabled={sending}
+                                    className="px-5 py-3 bg-accent text-white rounded-xl shadow-lg border border-slate-700 hover:bg-slate-800 transition-all disabled:opacity-50"
                                 >
                                     <Send size={18} />
                                 </button>

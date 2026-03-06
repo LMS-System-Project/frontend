@@ -5,266 +5,420 @@ import {
     Calendar,
     Clock,
     Sparkles,
-    Zap,
     Brain,
     ChevronLeft,
     ChevronRight,
     Plus,
     Target,
-    AlertCircle,
     Activity,
     Lock,
-    ArrowUpRight,
-    Search,
-    Filter,
-    MoreHorizontal,
     Smile,
     Coffee,
-    Moon
+    Moon,
+    Flame,
+    CheckCircle2,
+    AlertTriangle,
+    Zap,
+    TrendingUp,
+    Timer,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Event {
     id: string;
     title: string;
-    type: "assignment" | "deep-work" | "lecture" | "pro-match";
+    type: "assignment" | "deep-work" | "lecture" | "break";
     start: string;
     end: string;
     priority: "high" | "medium" | "low";
+    done?: boolean;
 }
 
-export default function SmartPlannerPage() {
-    const [view, setView] = useState<"calendar" | "timeline">("calendar");
-    const [selectedDate, setSelectedDate] = useState(new Date());
+interface Task {
+    id: string;
+    title: string;
+    course: string;
+    due: string;
+    priority: "high" | "medium" | "low";
+    done: boolean;
+}
 
-    const events: Event[] = [
-        { id: "1", title: "CS 301: Final Submission", type: "assignment", start: "09:00", end: "10:00", priority: "high" },
-        { id: "2", title: "AI Deep Work: Machine Learning", type: "deep-work", start: "11:00", end: "13:30", priority: "medium" },
-        { id: "3", title: "MA 201: Calculus Lecture", type: "lecture", start: "14:00", end: "15:30", priority: "low" },
-    ];
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const DATES = [24, 25, 26, 27, 28, 1, 2];
+const TODAY_IDX = 2;
+
+const EVENTS: Event[] = [
+    { id: "1", title: "CS 301: Final Submission", type: "assignment", start: "09:00", end: "10:30", priority: "high" },
+    { id: "2", title: "Deep Work: Machine Learning", type: "deep-work", start: "11:00", end: "13:00", priority: "medium" },
+    { id: "3", title: "MA 201: Calculus Lecture", type: "lecture", start: "14:00", end: "15:30", priority: "low" },
+];
+
+const INITIAL_TASKS: Task[] = [
+    { id: "1", title: "CS 301 Assignment 3", course: "CS 301", due: "Today", priority: "high", done: false },
+    { id: "2", title: "Read Chapter 7", course: "MA 201", due: "Tomorrow", priority: "medium", done: true },
+    { id: "3", title: "Lab Report Draft", course: "PHY 101", due: "Mar 3", priority: "medium", done: false },
+    { id: "4", title: "Quiz Prep: Linear Algebra", course: "MA 301", due: "Mar 4", priority: "low", done: false },
+];
+
+const typeConfig = {
+    assignment: { bg: "bg-red-50", border: "border-red-100", dot: "bg-red-500", text: "text-red-600", label: "Assignment" },
+    "deep-work": { bg: "bg-blue-50", border: "border-blue-100", dot: "bg-blue-500", text: "text-blue-600", label: "Deep Work" },
+    lecture: { bg: "bg-amber-50", border: "border-amber-100", dot: "bg-amber-400", text: "text-amber-600", label: "Lecture" },
+    break: { bg: "bg-emerald-50", border: "border-emerald-100", dot: "bg-emerald-400", text: "text-emerald-600", label: "Break" },
+};
+
+const priorityDot: Record<string, string> = { high: "bg-red-500", medium: "bg-amber-400", low: "bg-slate-300" };
+
+export default function SmartPlannerPage() {
+    const [selectedDay, setSelectedDay] = useState(TODAY_IDX);
+    const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
+    const [focusActive, setFocusActive] = useState(false);
+
+    const toggleTask = (id: string) => {
+        setTasks(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
+    };
+
+    const completedCount = tasks.filter(t => t.done).length;
+    const completionPct = Math.round((completedCount / tasks.length) * 100);
 
     return (
         <div className="space-y-8 max-w-[1200px] mx-auto pb-20">
-                {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div>
-                        <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
-                            <Calendar size={14} className="text-accent" />
-                            <span>Schedule • Weekly Planner</span>
-                        </div>
-                        <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">Study Planner</h1>
-                        <p className="text-sm text-slate-500 mt-1">
-                            Plan your <span className="text-accent font-bold italic">study sessions</span> and track upcoming deadlines.
-                        </p>
-                    </div>
 
-                    <div className="flex p-1 bg-slate-100 rounded-xl">
-                        <button
-                            onClick={() => setView("calendar")}
-                            className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${view === "calendar" ? "bg-white text-accent shadow-sm" : "text-slate-400"
-                                }`}
-                        >
-                            Calendar
-                        </button>
-                        <button
-                            onClick={() => setView("timeline")}
-                            className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${view === "timeline" ? "bg-white text-accent shadow-sm" : "text-slate-400"
-                                }`}
-                        >
-                            Timeline
-                        </button>
+            {/* ── Header ── */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                    <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
+                        <Calendar size={14} className="text-accent" />
+                        <span>Schedule • Weekly Planner</span>
                     </div>
+                    <h1 className="text-3xl font-bold text-primary-text tracking-tight uppercase italic underline decoration-slate-200">
+                        Study Planner
+                    </h1>
+                    <p className="text-sm text-slate-500 mt-1">
+                        Plan your <span className="text-accent font-bold italic">study sessions</span> and track upcoming deadlines.
+                    </p>
                 </div>
+                <button className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg hover:bg-black transition-all self-start md:self-auto">
+                    <Plus size={14} />
+                    Add Event
+                </button>
+            </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    {/* Main Interaction Area */}
-                    <div className="lg:col-span-8 space-y-8">
-                        {/* Weekly Calendar */}
-                        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm border-b-4 border-b-slate-100">
-                            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    <button className="p-2 rounded-lg hover:bg-slate-50 text-slate-400 transition-all">
-                                        <ChevronLeft size={16} />
-                                    </button>
-                                    <h3 className="text-sm font-black text-primary-text uppercase tracking-widest italic px-2">Feb 23 — Mar 01, 2025</h3>
-                                    <button className="p-2 rounded-lg hover:bg-slate-50 text-slate-400 transition-all">
-                                        <ChevronRight size={16} />
-                                    </button>
-                                </div>
-                                <button className="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg border border-slate-800 hover:bg-black transition-all flex items-center gap-2">
-                                    <Plus size={14} />
-                                    New Event
+            {/* ── Stats Row ── */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                    { icon: CheckCircle2, label: "Tasks Done", value: `${completedCount}/${tasks.length}`, color: "text-emerald-500", bg: "bg-emerald-50" },
+                    { icon: Flame, label: "Day Streak", value: "7 Days", color: "text-orange-500", bg: "bg-orange-50" },
+                    { icon: Timer, label: "Focus Hours", value: "4.5h", color: "text-blue-500", bg: "bg-blue-50" },
+                    { icon: TrendingUp, label: "This Week", value: `${completionPct}%`, color: "text-accent", bg: "bg-accent/5" },
+                ].map((s, i) => (
+                    <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.07 }}
+                        className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm border-b-4 border-b-slate-100 flex items-center gap-4"
+                    >
+                        <div className={`w-10 h-10 rounded-xl ${s.bg} flex items-center justify-center flex-shrink-0`}>
+                            <s.icon size={18} className={s.color} />
+                        </div>
+                        <div>
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{s.label}</p>
+                            <p className={`text-lg font-black italic ${s.color}`}>{s.value}</p>
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+                {/* ── Left: Day Selector + Events ── */}
+                <div className="lg:col-span-8 space-y-6">
+
+                    {/* Day selector strip */}
+                    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden border-b-4 border-b-slate-100">
+                        <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <button className="p-2 rounded-lg hover:bg-slate-50 text-slate-400 transition-all">
+                                    <ChevronLeft size={16} />
+                                </button>
+                                <h3 className="text-sm font-black text-primary-text uppercase tracking-widest italic">Feb 24 — Mar 2, 2025</h3>
+                                <button className="p-2 rounded-lg hover:bg-slate-50 text-slate-400 transition-all">
+                                    <ChevronRight size={16} />
                                 </button>
                             </div>
-
-                            <div className="grid grid-cols-7 border-b border-slate-100">
-                                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
-                                    <div key={day} className="py-3 text-center border-r border-slate-50 last:border-r-0">
-                                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{day}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="grid grid-cols-7 h-[600px] overflow-y-auto relative custom-scrollbar">
-                                {/* Time marker background */}
-                                <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px)', backgroundSize: '100% 50px' }} />
-
-                                {Array.from({ length: 7 }).map((_, dIdx) => (
-                                    <div key={dIdx} className="border-r border-slate-50 last:border-r-0 p-2 space-y-2 relative min-h-full bg-white group hover:bg-slate-50/30 transition-colors">
-                                        {dIdx === 2 && events.map(event => (
-                                            <div
-                                                key={event.id}
-                                                className={`p-3 rounded-xl border shadow-sm transition-all hover:scale-[1.02] cursor-pointer group/card ${event.type === 'assignment' ? 'bg-red-50 border-red-100' :
-                                                        event.type === 'deep-work' ? 'bg-accent/5 border-accent/10' :
-                                                            'bg-white border-slate-100'
-                                                    }`}
-                                            >
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <span className={`text-[8px] font-black uppercase tracking-widest ${event.type === 'assignment' ? 'text-red-500' :
-                                                            event.type === 'deep-work' ? 'text-accent' :
-                                                                'text-slate-400'
-                                                        }`}>{event.type}</span>
-                                                    <div className={`w-1.5 h-1.5 rounded-full ${event.priority === 'high' ? 'bg-red-500' :
-                                                            event.priority === 'medium' ? 'bg-amber-400' :
-                                                                'bg-slate-200'
-                                                        }`} />
-                                                </div>
-                                                <p className="text-[10px] font-bold text-primary-text leading-tight group-hover/card:text-accent transition-colors">{event.title}</p>
-                                                <div className="mt-3 flex items-center gap-1.5 text-slate-400">
-                                                    <Clock size={10} />
-                                                    <span className="text-[9px] font-bold uppercase tracking-tighter">{event.start} - {event.end}</span>
-                                                </div>
-                                            </div>
-                                        ))}
-
-                                        {/* AI Ghost Slot for tomorrow */}
-                                        {dIdx === 3 && (
-                                            <div className="p-3 rounded-xl border border-dashed border-accent/30 bg-accent/[0.02] animate-pulse-soft cursor-pointer group/ghost">
-                                                <div className="flex items-center gap-2 mb-2 text-accent">
-                                                    <Sparkles size={10} />
-                                                    <span className="text-[8px] font-black uppercase tracking-widest">AI Suggestion</span>
-                                                </div>
-                                                <p className="text-[10px] font-bold text-slate-400 italic">Recommended: 2H Focus Block</p>
-                                                <button className="mt-3 w-full py-1.5 bg-accent/10 text-accent rounded-lg text-[8px] font-black uppercase tracking-widest border border-accent/20 opacity-0 group-hover/ghost:opacity-100 transition-opacity">Add to Schedule</button>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
+                            <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest hidden sm:block">Week 8</span>
                         </div>
-
-                        {/* Intelligence Integration Area */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="bg-slate-900 rounded-3xl p-8 text-white relative overflow-hidden group">
-                                <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '15px 15px' }} />
-                                <div className="relative z-10">
-                                    <div className="flex items-center gap-2 text-accent mb-6">
-                                        <Brain size={18} />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">Smart Suggestions</span>
-                                    </div>
-                                    <h4 className="text-xl font-bold tracking-tight italic mb-4 underline decoration-accent/30 lowercase">Avoid the midnight oil.</h4>
-                                    <p className="text-xs text-slate-400 leading-relaxed font-medium italic">
-                                        Based on <span className="text-white font-bold">our analysis</span>, you have a high workload on Friday. We've suggested moving non-critical tasks to Saturday morning.
-                                    </p>
-                                    <button className="mt-8 px-6 py-3 bg-accent text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl border border-slate-700 hover:bg-slate-800 transition-all">Apply Changes</button>
-                                </div>
-                            </div>
-
-                            <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm flex flex-col border-b-4 border-b-slate-100 relative group overflow-hidden">
-                                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-20 transition-opacity">
-                                    <Zap size={100} className="text-accent" strokeWidth={1} />
-                                </div>
-                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
-                                    <Target size={14} className="text-accent" />
-                                    Schedule Overview
-                                </h4>
-                                <div className="space-y-6">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Task Completion</span>
-                                        <span className="text-xs font-black text-accent italic">98%</span>
-                                    </div>
-                                    <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden shadow-inner border border-slate-100">
-                                        <div className="h-full bg-accent shadow-[0_0_8px_rgba(27,51,84,0.3)] transition-all duration-1000" style={{ width: '98%' }} />
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Schedule Variance</span>
-                                        <span className="text-xs font-black text-emerald-500 italic">-4.2 min ahead</span>
-                                    </div>
-                                </div>
-                            </div>
+                        <div className="grid grid-cols-7 gap-2 p-4">
+                            {DAYS.map((day, i) => (
+                                <button
+                                    key={day}
+                                    onClick={() => setSelectedDay(i)}
+                                    className={`flex flex-col items-center py-3 px-1 rounded-xl transition-all ${
+                                        selectedDay === i
+                                            ? "bg-slate-900 text-white shadow-lg"
+                                            : i === TODAY_IDX
+                                            ? "bg-accent/10 text-accent"
+                                            : "bg-slate-50 text-slate-400 hover:bg-slate-100"
+                                    }`}
+                                >
+                                    <span className="text-[9px] font-black uppercase tracking-widest mb-1">{day}</span>
+                                    <span className={`text-base font-black italic ${selectedDay === i ? "text-white" : i === TODAY_IDX ? "text-accent" : "text-primary-text"}`}>
+                                        {DATES[i]}
+                                    </span>
+                                    {i === TODAY_IDX && (
+                                        <div className={`w-1.5 h-1.5 rounded-full mt-1 ${selectedDay === i ? "bg-white" : "bg-accent"}`} />
+                                    )}
+                                </button>
+                            ))}
                         </div>
                     </div>
 
-                    {/* Behavior Sidebar */}
-                    <div className="lg:col-span-4 space-y-8">
-                        {/* Procrastination Meter */}
-                        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm border-b-4 border-b-slate-100">
-                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
-                                <Activity size={14} className="text-red-500" />
-                                Procrastination Score
-                            </h4>
+                    {/* Events for selected day */}
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between px-1">
+                            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <Clock size={12} className="text-accent" />
+                                {selectedDay === TODAY_IDX ? "Today's Schedule" : `${DAYS[selectedDay]}, ${DATES[selectedDay]}`}
+                            </h3>
+                            {selectedDay === TODAY_IDX && (
+                                <span className="text-[9px] font-black text-accent uppercase tracking-widest bg-accent/10 px-2.5 py-1 rounded-full">Today</span>
+                            )}
+                        </div>
 
-                            <div className="flex flex-col items-center py-4">
-                                <div className="relative w-32 h-32">
-                                    <svg className="w-32 h-32 transform -rotate-90">
-                                        <circle cx="64" cy="64" r="58" fill="none" strokeWidth="8" className="stroke-slate-50" />
-                                        <circle
-                                            cx="64"
-                                            cy="64"
-                                            r="58"
-                                            fill="none"
-                                            strokeWidth="8"
-                                            strokeLinecap="round"
-                                            strokeDasharray="364"
-                                            strokeDashoffset={364 - (364 * 14) / 100}
-                                            className="stroke-emerald-500 transition-all duration-1000"
-                                        />
-                                    </svg>
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                        <span className="text-2xl font-black text-primary-text italic">14%</span>
-                                        <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">On Track</span>
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={selectedDay}
+                                initial={{ opacity: 0, x: 12 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -12 }}
+                                transition={{ duration: 0.2 }}
+                                className="space-y-3"
+                            >
+                                {selectedDay === TODAY_IDX ? EVENTS.map((event, idx) => {
+                                    const cfg = typeConfig[event.type];
+                                    return (
+                                        <motion.div
+                                            key={event.id}
+                                            initial={{ opacity: 0, y: 8 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: idx * 0.06 }}
+                                            className={`${cfg.bg} border ${cfg.border} rounded-2xl p-5 flex items-center gap-5 hover:shadow-md transition-all cursor-pointer`}
+                                        >
+                                            <div className={`w-1 self-stretch rounded-full flex-shrink-0 ${cfg.dot}`} />
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className={`text-[8px] font-black uppercase tracking-widest ${cfg.text}`}>{cfg.label}</span>
+                                                    <div className={`w-1.5 h-1.5 rounded-full ${priorityDot[event.priority]}`} />
+                                                </div>
+                                                <p className="text-sm font-bold text-primary-text truncate">{event.title}</p>
+                                                <div className="flex items-center gap-1.5 mt-1.5">
+                                                    <Clock size={10} className="text-slate-400" />
+                                                    <span className="text-[10px] font-bold text-slate-400">{event.start} – {event.end}</span>
+                                                </div>
+                                            </div>
+                                            <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest flex-shrink-0">
+                                                {(() => {
+                                                    const [sh, sm] = event.start.split(":").map(Number);
+                                                    const [eh, em] = event.end.split(":").map(Number);
+                                                    const mins = (eh * 60 + em) - (sh * 60 + sm);
+                                                    return mins >= 60 ? `${(mins / 60).toFixed(1)}h` : `${mins}m`;
+                                                })()}
+                                            </span>
+                                        </motion.div>
+                                    );
+                                }) : (
+                                    <div className="bg-white border border-dashed border-slate-200 rounded-2xl p-12 text-center">
+                                        <Calendar size={36} className="mx-auto text-slate-200 mb-4" />
+                                        <p className="text-sm font-bold text-slate-400">No events scheduled</p>
+                                        <button className="mt-4 px-5 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all inline-flex items-center gap-2">
+                                            <Plus size={12} />
+                                            Add Event
+                                        </button>
                                     </div>
+                                )}
+
+                                {/* AI Suggestion slot */}
+                                <div className="border border-dashed border-accent/30 bg-accent/[0.03] rounded-2xl p-4 flex items-center gap-4 group cursor-pointer hover:bg-accent/[0.06] transition-all">
+                                    <div className="w-8 h-8 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                                        <Sparkles size={14} className="text-accent" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-[9px] font-black text-accent uppercase tracking-widest">AI Suggestion</p>
+                                        <p className="text-xs font-bold text-slate-500 italic mt-0.5">Recommended: 2h Focus Block at 4 PM</p>
+                                    </div>
+                                    <button className="px-3 py-1.5 bg-accent text-white rounded-lg text-[9px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all">
+                                        Add
+                                    </button>
                                 </div>
-                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-8 text-center italic">Great job staying on track!</p>
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
+
+                    {/* Smart Suggestions Banner */}
+                    <div className="bg-slate-900 rounded-3xl p-8 text-white relative overflow-hidden">
+                        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '18px 18px' }} />
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-accent/20 rounded-full blur-[80px] -mr-24 -mt-24" />
+                        <div className="relative z-10 flex flex-col sm:flex-row items-start justify-between gap-6">
+                            <div>
+                                <div className="flex items-center gap-2 text-accent mb-4">
+                                    <Brain size={18} />
+                                    <span className="text-[10px] font-black uppercase tracking-[0.4em]">Smart Suggestions</span>
+                                </div>
+                                <h4 className="text-xl font-bold tracking-tight italic mb-3 underline decoration-accent/30 lowercase">
+                                    Avoid the midnight oil.
+                                </h4>
+                                <p className="text-xs text-slate-400 leading-relaxed font-medium italic max-w-sm">
+                                    High workload detected on <span className="text-white font-bold">Friday</span>. We suggest moving non-critical tasks to Saturday morning.
+                                </p>
                             </div>
-                        </div>
-
-                        {/* Flow Status */}
-                        <div className="space-y-4">
-                            {[
-                                { label: 'Optimal Focus', sub: '9AM - 1PM', icon: Smile, col: 'accent' },
-                                { label: 'Low Energy', sub: '4PM - 6PM', icon: Coffee, col: 'amber-500' },
-                                { label: 'Rest Period', sub: '11PM - 7AM', icon: Moon, col: 'indigo-500' },
-                            ].map((state, i) => (
-                                <div key={i} className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm flex items-center justify-between border-b-4 border-b-slate-100 group hover:border-b-accent transition-all">
-                                    <div className="flex items-center gap-4">
-                                        <div className={`w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-${state.col} group-hover:scale-110 transition-transform`}>
-                                            <state.icon size={18} />
-                                        </div>
-                                        <div>
-                                            <p className="text-[10px] font-black text-primary-text uppercase tracking-widest">{state.label}</p>
-                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">{state.sub}</p>
-                                        </div>
-                                    </div>
-                                    <ChevronRight size={14} className="text-slate-200 group-hover:text-accent transition-all" />
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Focus Mode */}
-                        <div className="bg-red-50 border border-red-100 rounded-2xl p-6 group">
-                            <h4 className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                <Lock size={14} />
-                                Focus Mode
-                            </h4>
-                            <p className="text-[10px] text-red-800 font-medium leading-relaxed italic mb-6">
-                                Enable <span className="font-bold underline decoration-red-200">Focus Mode</span> to block distractions and concentrate on your studies.
-                            </p>
-                            <button className="w-full py-3 bg-red-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg border border-red-700 hover:bg-red-700 transition-all">
-                                Start Focus Mode
+                            <button className="flex-shrink-0 px-5 py-3 bg-accent text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 transition-all border border-slate-700 whitespace-nowrap">
+                                Apply Changes
                             </button>
                         </div>
                     </div>
                 </div>
+
+                {/* ── Right Sidebar ── */}
+                <div className="lg:col-span-4 space-y-6">
+
+                    {/* Task Checklist */}
+                    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm border-b-4 border-b-slate-100 overflow-hidden">
+                        <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <Target size={13} className="text-accent" />
+                                Task List
+                            </h4>
+                            <div className="flex items-center gap-2">
+                                <div className="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                    <motion.div
+                                        className="h-full bg-emerald-500 rounded-full"
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${completionPct}%` }}
+                                        transition={{ duration: 0.8, ease: "easeOut" }}
+                                    />
+                                </div>
+                                <span className="text-[9px] font-black text-slate-400 italic">{completionPct}%</span>
+                            </div>
+                        </div>
+                        <div className="divide-y divide-slate-50">
+                            {tasks.map((task) => (
+                                <button
+                                    key={task.id}
+                                    onClick={() => toggleTask(task.id)}
+                                    className="w-full flex items-center gap-3 px-5 py-4 hover:bg-slate-50/60 transition-colors text-left group"
+                                >
+                                    <div className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                                        task.done ? "bg-emerald-500 border-emerald-500" : "border-slate-200 group-hover:border-accent"
+                                    }`}>
+                                        {task.done && <CheckCircle2 size={11} className="text-white" />}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className={`text-xs font-bold truncate transition-colors ${task.done ? "text-slate-300 line-through" : "text-primary-text group-hover:text-accent"}`}>
+                                            {task.title}
+                                        </p>
+                                        <div className="flex items-center gap-2 mt-0.5">
+                                            <span className="text-[9px] font-bold text-slate-300 uppercase tracking-wider">{task.course}</span>
+                                            <span className={`text-[9px] font-black uppercase tracking-wider flex items-center gap-0.5 ${task.due === "Today" ? "text-red-500" : "text-slate-300"}`}>
+                                                {task.due === "Today" && <AlertTriangle size={8} />}
+                                                {task.due}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${priorityDot[task.priority]}`} />
+                                </button>
+                            ))}
+                        </div>
+                        <div className="p-4 border-t border-slate-50">
+                            <button className="w-full py-2.5 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black text-slate-300 uppercase tracking-widest hover:border-accent hover:text-accent transition-all flex items-center justify-center gap-2">
+                                <Plus size={12} />
+                                Add Task
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Focus Score */}
+                    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm border-b-4 border-b-slate-100">
+                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-5 flex items-center gap-2">
+                            <Activity size={13} className="text-emerald-500" />
+                            Focus Score
+                        </h4>
+                        <div className="flex items-center gap-5">
+                            <div className="relative w-24 h-24 flex-shrink-0">
+                                <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 96 96">
+                                    <circle cx="48" cy="48" r="42" fill="none" strokeWidth="7" className="stroke-slate-100" />
+                                    <circle
+                                        cx="48" cy="48" r="42" fill="none" strokeWidth="7"
+                                        strokeLinecap="round"
+                                        strokeDasharray="264"
+                                        strokeDashoffset={264 - (264 * 86) / 100}
+                                        className="stroke-emerald-500 transition-all duration-1000"
+                                    />
+                                </svg>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                    <span className="text-xl font-black text-primary-text italic">86%</span>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <p className="text-sm font-bold text-primary-text italic">Great Focus!</p>
+                                <p className="text-[10px] text-slate-400 leading-relaxed">You're on track this week. Keep the momentum going.</p>
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                                    <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-wider">On Track</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Energy Windows */}
+                    <div className="space-y-3">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Energy Windows</p>
+                        {[
+                            { label: "Optimal Focus", sub: "9 AM – 1 PM", icon: Smile, color: "text-accent", bg: "bg-accent/5", hoverBorder: "hover:border-b-accent" },
+                            { label: "Low Energy", sub: "4 PM – 6 PM", icon: Coffee, color: "text-amber-500", bg: "bg-amber-50", hoverBorder: "hover:border-b-amber-400" },
+                            { label: "Rest Period", sub: "11 PM – 7 AM", icon: Moon, color: "text-indigo-500", bg: "bg-indigo-50", hoverBorder: "hover:border-b-indigo-400" },
+                        ].map((s, i) => (
+                            <div key={i} className={`bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center gap-4 border-b-4 border-b-slate-100 ${s.hoverBorder} transition-all group cursor-pointer`}>
+                                <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                                    <s.icon size={16} className={s.color} />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black text-primary-text uppercase tracking-widest">{s.label}</p>
+                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">{s.sub}</p>
+                                </div>
+                                <ChevronRight size={13} className="text-slate-200 group-hover:text-accent ml-auto transition-all" />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Focus Mode Toggle */}
+                    <motion.div
+                        className={`rounded-2xl p-6 border transition-colors duration-500 ${focusActive ? "bg-slate-900 border-slate-800" : "bg-red-50 border-red-100"}`}
+                        animate={focusActive ? { scale: [1, 1.008, 1] } : {}}
+                        transition={{ duration: 2.5, repeat: Infinity }}
+                    >
+                        <h4 className={`text-[10px] font-black uppercase tracking-widest mb-3 flex items-center gap-2 ${focusActive ? "text-emerald-400" : "text-red-600"}`}>
+                            {focusActive ? <Zap size={13} /> : <Lock size={13} />}
+                            {focusActive ? "Focus Mode Active" : "Focus Mode"}
+                        </h4>
+                        <p className={`text-[10px] font-medium leading-relaxed italic mb-5 ${focusActive ? "text-slate-400" : "text-red-800"}`}>
+                            {focusActive
+                                ? "Distractions blocked. Stay in the zone — you're doing great."
+                                : "Block distractions and concentrate fully on your studies."}
+                        </p>
+                        <button
+                            onClick={() => setFocusActive(f => !f)}
+                            className={`w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg transition-all ${
+                                focusActive
+                                    ? "bg-emerald-500 text-white border border-emerald-600 hover:bg-emerald-600"
+                                    : "bg-red-600 text-white border border-red-700 hover:bg-red-700"
+                            }`}
+                        >
+                            {focusActive ? "Stop Focus Mode" : "Start Focus Mode"}
+                        </button>
+                    </motion.div>
+                </div>
+            </div>
         </div>
     );
 }

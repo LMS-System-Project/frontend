@@ -23,6 +23,7 @@ import {
     ShieldCheck,
     BrainCircuit,
     ChevronRight,
+    Activity,
     Search
 } from "lucide-react";
 

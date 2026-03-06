@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   FileText,
   Upload,
@@ -29,6 +29,8 @@ export default function StudentAssignmentsPage() {
   const [submitting, setSubmitting] = useState<string | null>(null);
   const [submitModal, setSubmitModal] = useState<any | null>(null);
   const [notes, setNotes] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function loadAssignments() {
     try {
@@ -49,10 +51,15 @@ export default function StudentAssignmentsPage() {
     if (!submitModal) return;
     setSubmitting(submitModal.id);
     try {
-      await api.student.assignments.submit(submitModal.id, notes);
+      if (selectedFile) {
+        await api.student.assignments.submitWithFile(submitModal.id, selectedFile, notes || undefined);
+      } else {
+        await api.student.assignments.submitWithFile(submitModal.id, undefined, notes || undefined);
+      }
       await loadAssignments();
       setSubmitModal(null);
       setNotes("");
+      setSelectedFile(null);
     } catch (err) {
       console.error(err);
     } finally {
@@ -118,11 +125,10 @@ export default function StudentAssignmentsPage() {
           <button
             key={tab.key}
             onClick={() => setFilter(tab.key)}
-            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${
-              filter === tab.key
-                ? "bg-slate-900 text-white border-slate-900"
-                : "bg-white text-slate-400 border-slate-200 hover:border-slate-400"
-            }`}
+            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${filter === tab.key
+              ? "bg-slate-900 text-white border-slate-900"
+              : "bg-white text-slate-400 border-slate-200 hover:border-slate-400"
+              }`}
           >
             {tab.label}
             {tab.key !== "all" && (
@@ -155,9 +161,8 @@ export default function StudentAssignmentsPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
-                className={`bg-white border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all ${
-                  isOverdue ? "border-red-200 bg-red-50/30" : "border-slate-200"
-                }`}
+                className={`bg-white border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all ${isOverdue ? "border-red-200 bg-red-50/30" : "border-slate-200"
+                  }`}
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -201,7 +206,7 @@ export default function StudentAssignmentsPage() {
                   <div className="flex-shrink-0">
                     {assignment.submission_status === "not_submitted" ? (
                       <button
-                        onClick={() => { setSubmitModal(assignment); setNotes(""); }}
+                        onClick={() => { setSubmitModal(assignment); setNotes(""); setSelectedFile(null); }}
                         className="flex items-center gap-2 px-5 py-2.5 bg-accent text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow hover:bg-slate-800 transition-all"
                       >
                         <Upload size={12} />
@@ -228,7 +233,7 @@ export default function StudentAssignmentsPage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
-            onClick={(e) => { if (e.target === e.currentTarget) { setSubmitModal(null); setNotes(""); } }}
+            onClick={(e) => { if (e.target === e.currentTarget) { setSubmitModal(null); setNotes(""); setSelectedFile(null); } }}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -242,10 +247,33 @@ export default function StudentAssignmentsPage() {
                   <p className="text-xs text-slate-400 mt-1">{submitModal.title}</p>
                 </div>
                 <button
-                  onClick={() => { setSubmitModal(null); setNotes(""); }}
+                  onClick={() => { setSubmitModal(null); setNotes(""); setSelectedFile(null); }}
                   className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 transition-colors"
                 >
                   <X size={16} />
+                </button>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">
+                  Upload File (Optional)
+                </label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full p-4 border-2 border-dashed border-slate-200 rounded-xl text-xs text-slate-400 hover:border-accent hover:text-accent transition-colors text-center cursor-pointer"
+                >
+                  {selectedFile ? (
+                    <span className="text-accent font-bold">📎 {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)</span>
+                  ) : (
+                    <span>Click to attach a file (PDF, DOC, images, etc.)</span>
+                  )}
                 </button>
               </div>
 
@@ -258,13 +286,13 @@ export default function StudentAssignmentsPage() {
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Add any notes or comments for your instructor..."
                   className="w-full p-4 border border-slate-200 rounded-xl text-xs text-primary-text placeholder-slate-400 focus:outline-none focus:border-accent transition-colors resize-none"
-                  rows={4}
+                  rows={3}
                 />
               </div>
 
               <div className="flex gap-3">
                 <button
-                  onClick={() => { setSubmitModal(null); setNotes(""); }}
+                  onClick={() => { setSubmitModal(null); setNotes(""); setSelectedFile(null); }}
                   className="flex-1 py-3 border border-slate-200 rounded-xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:bg-slate-50 transition-all"
                 >
                   Cancel
