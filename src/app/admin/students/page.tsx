@@ -1,348 +1,449 @@
 "use client";
 
-import { useState } from "react";
-import DashboardShell from "@/components/dashboard/DashboardShell";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import {
-    Search,
-    Filter,
-    ChevronDown,
-    ChevronUp,
-    Eye,
-    TrendingUp,
-    AlertTriangle,
-    CheckCircle,
-    Users,
-    Activity,
-    ShieldCheck,
-    Target,
-    ArrowUpRight,
-    ArrowDownRight,
-    Search as SearchIcon,
-    Calendar,
-    MoreHorizontal,
-    Mail,
-    ExternalLink
+  Users,
+  Search,
+  Plus,
+  Trash2,
+  X,
+  UserCheck,
+  UserPlus,
+  Clock,
+  Mail,
+  Building,
+  ShieldCheck,
+  Loader2,
+  AlertTriangle,
+  GraduationCap,
+  Edit3,
+  ChevronDown,
 } from "lucide-react";
-import {
-    AreaChart,
-    Area,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer
-} from 'recharts';
+import { motion, AnimatePresence } from "framer-motion";
+import { api } from "@/services/api";
 
-const students = [
-    {
-        id: 1, name: "Alexandra Kim", enroll: "CS2022001", dept: "Computer Science", year: 3, gpa: 8.7, risk: "Low", status: "Active", attendance: "93%",
-        history: [{ sem: "S1", gpa: 7.2 }, { sem: "S2", gpa: 7.8 }, { sem: "S3", gpa: 8.1 }, { sem: "S4", gpa: 7.9 }, { sem: "S5", gpa: 8.4 }, { sem: "S6", gpa: 8.7 }],
-        activity: ["Submitted CS 301 Assignment · 2h ago", "Accessed Physics lecture · 1d ago", "Logged in · 2d ago"],
-    },
-    {
-        id: 2, name: "Arjun Mehta", enroll: "EC2023042", dept: "Electronics", year: 2, gpa: 5.8, risk: "High", status: "At Risk", attendance: "62%",
-        history: [{ sem: "S1", gpa: 6.5 }, { sem: "S2", gpa: 6.1 }, { sem: "S3", gpa: 5.8 }],
-        activity: ["Missed 3 consecutive lectures · Yesterday", "Last login · 4d ago"],
-    },
-    {
-        id: 3, name: "Priya Sinha", enroll: "ME2022078", dept: "Mechanical", year: 3, gpa: 6.1, risk: "High", status: "At Risk", attendance: "68%",
-        history: [{ sem: "S1", gpa: 7.1 }, { sem: "S2", gpa: 6.8 }, { sem: "S3", gpa: 6.4 }, { sem: "S4", gpa: 6.1 }],
-        activity: ["Overdue: 2 assignments · Today", "Accessed Math lecture · 3d ago"],
-    },
-    {
-        id: 4, name: "Samuel Okafor", enroll: "CE2023015", dept: "Civil", year: 2, gpa: 7.2, risk: "Medium", status: "Active", attendance: "78%",
-        history: [{ sem: "S1", gpa: 6.9 }, { sem: "S2", gpa: 7.0 }, { sem: "S3", gpa: 7.2 }],
-        activity: ["Submitted Civil project · Yesterday", "Attended seminar · 2d ago"],
-    },
-    {
-        id: 5, name: "Mei Lin Zhang", enroll: "CS2021033", dept: "Computer Science", year: 4, gpa: 9.1, risk: "Low", status: "Active", attendance: "97%",
-        history: [{ sem: "S1", gpa: 8.5 }, { sem: "S2", gpa: 8.8 }, { sem: "S3", gpa: 9.0 }, { sem: "S4", gpa: 8.9 }, { sem: "S5", gpa: 9.1 }],
-        activity: ["Top scorer in CS 401 · Today", "Internship application submitted · 1d ago"],
-    },
-];
+interface User {
+  id: string;
+  email: string;
+  full_name: string;
+  role: string;
+  department: string | null;
+  created_at: string | null;
+}
 
-const RISK_THEMES: Record<string, { label: string; color: string; bg: string; icon: any }> = {
-    High: { label: "CRITICAL RISK", color: "text-red-600", bg: "bg-red-50 border-red-100", icon: AlertTriangle },
-    Medium: { label: "MODERATE", color: "text-amber-600", bg: "bg-amber-50 border-amber-100", icon: Activity },
-    Low: { label: "LOW RISK", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-100", icon: CheckCircle },
+const ROLE_THEME: Record<string, { label: string; color: string; bg: string; icon: any }> = {
+  student:    { label: "STUDENT",    color: "text-blue-600",    bg: "bg-blue-50",    icon: Users },
+  instructor: { label: "INSTRUCTOR", color: "text-emerald-600", bg: "bg-emerald-50", icon: GraduationCap },
+  admin:      { label: "ADMIN",      color: "text-purple-600",  bg: "bg-purple-50",  icon: ShieldCheck },
 };
 
-export default function AdminStudentsPage() {
-    const [search, setSearch] = useState("");
-    const [expanded, setExpanded] = useState<number | null>(null);
+const DEPARTMENTS = [
+  "Computer Science", "Electronics", "Mechanical", "Civil",
+  "Mathematics", "Physics", "Chemistry", "Humanities",
+];
 
-    const filtered = students.filter(
-        (s) =>
-            s.name.toLowerCase().includes(search.toLowerCase()) ||
-            s.enroll.toLowerCase().includes(search.toLowerCase()) ||
-            s.dept.toLowerCase().includes(search.toLowerCase())
-    );
+export default function AdminUsersPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-96"><Loader2 className="animate-spin text-accent" size={32} /></div>}>
+      <AdminUsersContent />
+    </Suspense>
+  );
+}
 
-    function hashColor(name: string): string {
-        const colors = ["indigo", "emerald", "purple", "rose", "cyan", "amber", "teal", "blue", "orange", "pink"];
-        let hash = 0;
-        for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-        return colors[Math.abs(hash) % colors.length];
+function AdminUsersContent() {
+  const searchParams = useSearchParams();
+  const initialRole = searchParams.get("role") || "";
+
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState(initialRole);
+
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  // Form state
+  const [formName, setFormName] = useState("");
+  const [formEmail, setFormEmail] = useState("");
+  const [formPassword, setFormPassword] = useState("");
+  const [formRole, setFormRole] = useState("student");
+  const [formDept, setFormDept] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  async function loadUsers() {
+    try {
+      setLoading(true);
+      const data = await api.admin.users.list(roleFilter || undefined);
+      setUsers(data);
+    } catch (err: any) {
+      setError(err.message || "Failed to load users");
+    } finally {
+      setLoading(false);
     }
+  }
 
+  useEffect(() => {
+    loadUsers();
+  }, [roleFilter]);
+
+  function openCreate() {
+    setEditingUser(null);
+    setFormName(""); setFormEmail(""); setFormPassword(""); setFormRole("student"); setFormDept("");
+    setShowModal(true);
+  }
+
+  function openEdit(u: User) {
+    setEditingUser(u);
+    setFormName(u.full_name); setFormEmail(u.email); setFormPassword(""); setFormRole(u.role); setFormDept(u.department || "");
+    setShowModal(true);
+  }
+
+  async function handleSave() {
+    if (!formName.trim()) return;
+    setSaving(true);
+    try {
+      if (editingUser) {
+        await api.admin.users.update(editingUser.id, {
+          full_name: formName,
+          role: formRole,
+          department: formDept || undefined,
+        });
+      } else {
+        if (!formEmail.trim() || !formPassword.trim()) return;
+        await api.admin.users.create({
+          email: formEmail,
+          password: formPassword,
+          full_name: formName,
+          role: formRole,
+          department: formDept || undefined,
+        });
+      }
+      setShowModal(false);
+      loadUsers();
+    } catch (err: any) {
+      alert(err.message || "Failed to save user");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!deleteId) return;
+    try {
+      await api.admin.users.delete(deleteId);
+      setDeleteId(null);
+      loadUsers();
+    } catch (err: any) {
+      alert(err.message || "Failed to delete user");
+    }
+  }
+
+  const filtered = users.filter((u) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
     return (
-        <DashboardShell role="admin">
-            <div className="space-y-8 max-w-[1200px] mx-auto pb-20">
-                {/* Page Header */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
-                    <div>
-                        <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-3">
-                            <Users size={14} className="text-accent" />
-                            <span>User Management • Student Directory</span>
-                        </div>
-                        <h1 className="text-4xl font-bold text-primary-text tracking-tight font-serif">
-                            Student Directory
-                        </h1>
-                        <p className="text-sm text-slate-500 mt-2 max-w-md leading-relaxed">
-                            Managing <span className="text-accent font-bold">{students.length} student profiles</span> across all departments.
-                        </p>
-                    </div>
-                    <div className="flex gap-4">
-                        <div className="bg-white border border-slate-200 rounded-2xl px-6 py-4 shadow-sm flex items-center gap-4 transition-all hover:border-accent group">
-                            <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-accent shadow-inner group-hover:bg-accent group-hover:text-white transition-all">
-                                <Activity size={22} />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold text-primary-text leading-none tracking-tight">94.2%</p>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">Active Index</p>
-                            </div>
-                        </div>
-                        <div className="bg-white border border-slate-200 rounded-2xl px-6 py-4 shadow-sm flex items-center gap-4 transition-all hover:border-red-200 group">
-                            <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-red-500 shadow-inner group-hover:bg-red-500 group-hover:text-white transition-all">
-                                <AlertTriangle size={22} />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold text-primary-text leading-none tracking-tight">08</p>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">Risk Flags</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Tactical Search & Filter */}
-                <div className="flex flex-col sm:flex-row items-center gap-4 py-2">
-                    <div className="relative flex-1 group w-full">
-                        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-accent transition-colors" size={18} />
-                        <input
-                            type="text"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search by name, enrollment ID, or department..."
-                            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-accent transition-all shadow-sm"
-                        />
-                    </div>
-                    <select className="w-full sm:w-auto px-6 py-3 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 bg-white shadow-sm uppercase tracking-widest focus:outline-none focus:ring-1 focus:ring-accent appearance-none text-center">
-                        <option>All Departments</option>
-                        <option>Computer Science</option>
-                        <option>Electronics</option>
-                        <option>Mechanical</option>
-                    </select>
-                </div>
-
-                {/* Student Table */}
-                <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm border-b-4 border-b-slate-100">
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="bg-slate-50/50 border-b border-slate-200">
-                                    {["Profile", "Student ID", "Department", "Year", "GPA", "Risk Level", "Status", ""].map((h, i) => (
-                                        <th key={i} className="text-left px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                                            {h}
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {filtered.map((student) => (
-                                    <>
-                                        <tr key={student.id} className={`group hover:bg-slate-50/50 transition-colors ${expanded === student.id ? 'bg-slate-50/50' : ''}`}>
-                                            <td className="px-6 py-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className={`w-11 h-11 rounded-2xl bg-slate-100 flex items-center justify-center text-xs font-bold border border-slate-200 transition-all group-hover:border-accent group-hover:bg-accent/5`}>
-                                                        {student.name.charAt(0)}
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-bold text-slate-800 tracking-tight group-hover:text-accent transition-colors">{student.name}</p>
-                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Validated Profile</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-6 text-[11px] font-bold text-slate-500 font-mono">{student.enroll}</td>
-                                            <td className="px-6 py-6">
-                                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-3 py-1.5 bg-slate-100/50 border border-slate-200 rounded-full whitespace-nowrap">
-                                                    {student.dept}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-6 text-center">
-                                                <span className="text-xs font-bold text-slate-700">L-{student.year}</span>
-                                            </td>
-                                            <td className="px-6 py-6 text-left">
-                                                <div className="flex flex-col gap-1.5">
-                                                    <span className="text-sm font-bold text-accent tracking-tighter">{student.gpa}</span>
-                                                    <div className="w-16 h-1 w-full max-w-[80px] bg-slate-100 rounded-full overflow-hidden">
-                                                        <div className="h-full bg-accent" style={{ width: `${(student.gpa / 10) * 100}%` }} />
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-6">
-                                                {(() => {
-                                                    const theme = RISK_THEMES[student.risk];
-                                                    return (
-                                                        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${theme.bg} whitespace-nowrap`}>
-                                                            <theme.icon size={12} className={theme.color} />
-                                                            <span className={`text-[9px] font-black uppercase tracking-widest ${theme.color}`}>{theme.label}</span>
-                                                        </div>
-                                                    );
-                                                })()}
-                                            </td>
-                                            <td className="px-6 py-6">
-                                                <div className="flex items-center gap-2.5">
-                                                    <div className={`w-2 h-2 rounded-full ${student.status === "Active" ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)] animate-pulse" : "bg-red-500"}`} />
-                                                    <span className={`text-[10px] font-bold uppercase tracking-widest ${student.status === "Active" ? "text-emerald-700" : "text-red-700"}`}>{student.status}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <button
-                                                    onClick={() => setExpanded(expanded === student.id ? null : student.id)}
-                                                    className="p-2 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-accent hover:border-accent hover:shadow-sharp transition-all"
-                                                >
-                                                    {expanded === student.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        {expanded === student.id && (
-                                            <tr>
-                                                <td colSpan={8} className="px-10 py-12 bg-slate-50/50 border-y border-slate-200 animate-in slide-in-from-top duration-300">
-                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                                                        {/* GPA Trajectory */}
-                                                        <div className="space-y-6">
-                                                            <div className="flex items-center justify-between">
-                                                                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                                                                    <TrendingUp size={12} className="text-accent" />
-                                                                    GPA Trajectory
-                                                                </h4>
-                                                                <span className="text-[10px] font-bold text-accent italic">Trending Positive</span>
-                                                            </div>
-                                                            <div className="h-[140px] w-full">
-                                                                <ResponsiveContainer width="100%" height="100%">
-                                                                    <AreaChart data={student.history}>
-                                                                        <defs>
-                                                                            <linearGradient id="gpaGradient" x1="0" y1="0" x2="0" y2="1">
-                                                                                <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.2} />
-                                                                                <stop offset="95%" stopColor="var(--accent)" stopOpacity={0} />
-                                                                            </linearGradient>
-                                                                        </defs>
-                                                                        <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#e2e8f0" />
-                                                                        <XAxis dataKey="sem" hide />
-                                                                        <YAxis hide domain={[0, 10]} />
-                                                                        <Tooltip
-                                                                            contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                                                        />
-                                                                        <Area type="monotone" dataKey="gpa" stroke="var(--accent)" fill="url(#gpaGradient)" strokeWidth={3} />
-                                                                    </AreaChart>
-                                                                </ResponsiveContainer>
-                                                            </div>
-                                                            <div className="flex justify-between px-2">
-                                                                {student.history.map(h => (
-                                                                    <span key={h.sem} className="text-[10px] font-bold text-slate-400">{h.sem}</span>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Operational Logs */}
-                                                        <div className="space-y-6">
-                                                            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                                                                <Activity size={12} className="text-slate-500" />
-                                                                Recent Activity
-                                                            </h4>
-                                                            <div className="space-y-4">
-                                                                {student.activity.map((act, idx) => (
-                                                                    <div key={idx} className="flex gap-4">
-                                                                        <div className="w-1.5 h-1.5 rounded-full bg-slate-200 mt-1.5 flex-shrink-0" />
-                                                                        <p className="text-[12px] font-medium text-slate-600 leading-relaxed italic">{act}</p>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Admin Actions */}
-                                                        <div className="space-y-6">
-                                                            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                                                                <ShieldCheck size={12} className="text-emerald-500" />
-                                                                Admin Actions
-                                                            </h4>
-                                                            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                                                                {student.risk === "High" ? (
-                                                                    <div className="space-y-4">
-                                                                        <div className="flex items-center gap-2 text-red-600">
-                                                                            <AlertTriangle size={15} />
-                                                                            <span className="text-[10px] font-black uppercase tracking-widest">Action Required</span>
-                                                                        </div>
-                                                                        <ul className="space-y-3">
-                                                                            <li className="text-[11px] font-bold text-slate-500 flex items-center gap-3">
-                                                                                <div className="w-1 h-1 rounded-full bg-red-400" />
-                                                                                REFER TO ACADEMIC ADVISOR
-                                                                            </li>
-                                                                            <li className="text-[11px] font-bold text-slate-500 flex items-center gap-3">
-                                                                                <div className="w-1 h-1 rounded-full bg-red-400" />
-                                                                                SCHEDULE COURSE REVIEW
-                                                                            </li>
-                                                                        </ul>
-                                                                    </div>
-                                                                ) : (
-                                                                    <div className="flex flex-col items-center justify-center py-4 text-center">
-                                                                        <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 mb-3 border border-emerald-100">
-                                                                            <CheckCircle size={24} />
-                                                                        </div>
-                                                                        <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.1em]">On Track</p>
-                                                                        <p className="text-[10px] text-slate-400 font-medium italic mt-1.5 leading-snug">Status: No intervention needed</p>
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="mt-12 pt-8 border-t border-slate-200 flex items-center justify-end gap-5">
-                                                        <button className="px-6 py-2.5 bg-white border border-slate-300 rounded-xl text-[10px] font-bold text-slate-500 hover:text-accent hover:border-accent hover:bg-accent/5 transition-all uppercase tracking-[0.15em] shadow-sm">
-                                                            View Full Profile
-                                                        </button>
-                                                        <button className="px-6 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-[10px] font-bold text-white hover:bg-black transition-all uppercase tracking-[0.15em] shadow-lg">
-                                                            Modify Credentials
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Pagination */}
-                    <div className="px-8 py-6 bg-slate-50 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
-                            Showing <span className="text-primary-text">{filtered.length}</span> of <span className="text-primary-text">189</span> total students
-                        </p>
-                        <div className="flex gap-2">
-                            {["01", "02", "03", "...", "99"].map((p, i) => (
-                                <button
-                                    key={i}
-                                    className={`w-9 h-9 rounded-xl text-[10px] font-black transition-all border ${p === "01" ? "bg-accent text-white border-slate-700 shadow-lg" : "bg-white text-slate-400 border-slate-200 hover:border-accent/40"
-                                        }`}
-                                >
-                                    {p}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </DashboardShell>
+      u.full_name.toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q) ||
+      (u.department || "").toLowerCase().includes(q)
     );
+  });
+
+  const stats = {
+    total: users.length,
+    students: users.filter((u) => u.role === "student").length,
+    instructors: users.filter((u) => u.role === "instructor").length,
+    admins: users.filter((u) => u.role === "admin").length,
+  };
+
+  if (loading && users.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Loader2 className="animate-spin text-accent" size={32} />
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-8 max-w-[1200px] mx-auto pb-20"
+    >
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-[0.25em] mb-3">
+            <ShieldCheck size={14} className="text-accent" />
+            <span>Administration • User Management</span>
+          </div>
+          <h1 className="text-4xl font-bold text-primary-text tracking-tight mb-2">
+            All Users
+          </h1>
+          <p className="text-sm text-slate-500">
+            Manage <span className="text-accent font-bold">{stats.total} accounts</span> —{" "}
+            {stats.students} students, {stats.instructors} instructors, {stats.admins} admins.
+          </p>
+        </div>
+        <button
+          onClick={openCreate}
+          className="flex items-center gap-2 px-6 py-3.5 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl hover:bg-black transition-all"
+        >
+          <UserPlus size={16} />
+          Add User
+        </button>
+      </div>
+
+      {/* Stat pills */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {[
+          { label: "Total", val: stats.total, color: "text-slate-600", bg: "bg-slate-100", role: "" },
+          { label: "Students", val: stats.students, color: "text-blue-600", bg: "bg-blue-50", role: "student" },
+          { label: "Instructors", val: stats.instructors, color: "text-emerald-600", bg: "bg-emerald-50", role: "instructor" },
+          { label: "Admins", val: stats.admins, color: "text-purple-600", bg: "bg-purple-50", role: "admin" },
+        ].map((s, i) => (
+          <button
+            key={s.label}
+            onClick={() => setRoleFilter(s.role)}
+            className={`bg-white border rounded-2xl p-5 shadow-sm hover:shadow-md transition-all text-left ${roleFilter === s.role ? "border-accent ring-1 ring-accent/30" : "border-slate-200"}`}
+          >
+            <div className={`text-2xl font-bold tracking-tighter ${s.color}`}>{s.val}</div>
+            <div className="text-[10px] font-black text-slate-400 tracking-[0.15em] uppercase mt-1">{s.label}</div>
+          </button>
+        ))}
+      </div>
+
+      {/* Search */}
+      <div className="relative group">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-accent transition-colors" size={18} />
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by name, email, or department..."
+          className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-accent shadow-sm"
+        />
+      </div>
+
+      {/* Users Table */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <table className="w-full text-left">
+          <thead>
+            <tr className="border-b border-slate-100">
+              <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Name</th>
+              <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] hidden md:table-cell">Email</th>
+              <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Role</th>
+              <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] hidden lg:table-cell">Department</th>
+              <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-6 py-16 text-center text-sm text-slate-400">
+                  {search ? "No users match your search." : "No users found."}
+                </td>
+              </tr>
+            ) : (
+              filtered.map((u) => {
+                const theme = ROLE_THEME[u.role] || ROLE_THEME.student;
+                return (
+                  <tr key={u.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="font-semibold text-sm text-primary-text">{u.full_name}</div>
+                    </td>
+                    <td className="px-6 py-4 hidden md:table-cell text-sm text-slate-500">{u.email}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${theme.bg} ${theme.color}`}>
+                        <theme.icon size={12} />
+                        {theme.label}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 hidden lg:table-cell text-sm text-slate-500">
+                      {u.department || "—"}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => openEdit(u)}
+                          className="p-2 text-slate-400 hover:text-accent hover:bg-slate-100 rounded-lg transition-colors"
+                          title="Edit"
+                        >
+                          <Edit3 size={15} />
+                        </button>
+                        <button
+                          onClick={() => setDeleteId(u.id)}
+                          className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ── Create / Edit Modal ────────────────────────────────── */}
+      <AnimatePresence>
+        {showModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+            onClick={() => setShowModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold text-primary-text">
+                  {editingUser ? "Edit User" : "Create New User"}
+                </h2>
+                <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Full Name</label>
+                  <input
+                    value={formName}
+                    onChange={(e) => setFormName(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-accent"
+                    placeholder="John Doe"
+                  />
+                </div>
+
+                {!editingUser && (
+                  <>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Email</label>
+                      <input
+                        value={formEmail}
+                        onChange={(e) => setFormEmail(e.target.value)}
+                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-accent"
+                        placeholder="user@university.edu"
+                        type="email"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Password</label>
+                      <input
+                        value={formPassword}
+                        onChange={(e) => setFormPassword(e.target.value)}
+                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-accent"
+                        placeholder="Min 6 characters"
+                        type="password"
+                      />
+                    </div>
+                  </>
+                )}
+
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Role</label>
+                  <select
+                    value={formRole}
+                    onChange={(e) => setFormRole(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-accent bg-white"
+                  >
+                    <option value="student">Student</option>
+                    <option value="instructor">Instructor</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Department</label>
+                  <select
+                    value={formDept}
+                    onChange={(e) => setFormDept(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-accent bg-white"
+                  >
+                    <option value="">None</option>
+                    {DEPARTMENTS.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 mt-8">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 px-4 py-3 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="flex-1 px-4 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-black transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {saving && <Loader2 size={14} className="animate-spin" />}
+                  {editingUser ? "Save Changes" : "Create User"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Delete Confirmation ────────────────────────────────── */}
+      <AnimatePresence>
+        {deleteId && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+            onClick={() => setDeleteId(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 text-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="w-14 h-14 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Trash2 size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-primary-text mb-2">Delete User?</h3>
+              <p className="text-sm text-slate-500 mb-6">
+                This will permanently remove the user and their auth account. This cannot be undone.
+              </p>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setDeleteId(null)}
+                  className="flex-1 px-4 py-3 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
 }

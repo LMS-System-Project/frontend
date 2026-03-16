@@ -20,52 +20,10 @@ export default function LoginPage() {
         setLoading(true);
         setError("");
 
-        const normalizedEmail = email.trim().toLowerCase();
-        console.log("DEBUG: Login Attempt", {
-            roleSelected: roleMode,
-            emailEntered: normalizedEmail,
-            passwordEntered: password.trim(),
-            expectedEmail: "admin@gradeflow.com",
-            expectedPass: "admin123"
-        });
-
-        // --- HYPER-ROBUST LOCAL BYPASS FOR ADMIN ---
-        // Catch admin credentials REGARDLESS of the tab selected
-        if (normalizedEmail === "admin@gradeflow.com" && password.trim() === "admin123") {
-            console.log("MATCH: Master Admin detected. Bypassing backend...");
-            const targetPath = "/admin/dashboard";
-
-            if (typeof window !== "undefined") {
-                localStorage.setItem("gradeflow_token", "local-admin-bypass-token");
-                localStorage.setItem("gradeflow_user", JSON.stringify({
-                    role: "admin",
-                    email: "admin@gradeflow.com",
-                    full_name: "Sneha Varghese",
-                    id: "local-admin-id"
-                }));
-            }
-
-            console.log("Login: State set, redirecting...");
-            router.push(targetPath);
-
-            setTimeout(() => {
-                if (window.location.pathname !== targetPath) {
-                    console.log("Login: Forcing location update.");
-                    window.location.href = targetPath;
-                }
-            }, 800);
-
-            setLoading(false);
-            return;
-        }
-        // --------------------------------------------
-
         try {
-            console.log("Login: Proceeding to backend authentication...");
-            const data = await api.auth.login({ email: normalizedEmail, password });
-            console.log("Login: Backend success, data returned:", data);
+            const data = await api.auth.login({ email: email.trim(), password });
 
-            // Determine role from the backend response (user.role is authoritative)
+            // Determine role from the backend response
             const userRole = data.user?.role || data.role;
             let targetPath = "/student/dashboard";
 
@@ -75,21 +33,15 @@ export default function LoginPage() {
                 targetPath = "/admin/dashboard";
             }
 
-            console.log("Login: Redirecting to", targetPath);
-
-            // Primary Next.js navigation
             router.push(targetPath);
 
-            // Secondary fallback if router hangs
             setTimeout(() => {
                 if (window.location.pathname !== targetPath) {
-                    console.log("Login: Push took too long, forcing location update.");
                     window.location.href = targetPath;
                 }
             }, 1500);
 
         } catch (err: any) {
-            console.error("Login: Error", err);
             setError(err.message || "Invalid credentials. Please try again.");
         } finally {
             setLoading(false);
@@ -159,7 +111,7 @@ export default function LoginPage() {
                             </div>
                             <input
                                 id="email"
-                                type="email"
+                                type="text"
                                 required
                                 className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-md bg-white text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent transition-all"
                                 placeholder="name@university.edu"

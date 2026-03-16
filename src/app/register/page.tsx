@@ -18,7 +18,7 @@ export default function SignupPage() {
         password: "",
         gender: "",
         location: "",
-        role: "student" as "student" | "instructor" | "admin",
+        role: "student" as "student" | "instructor",
     });
 
     const handleSubmit = async (e: React.FormEvent) => {

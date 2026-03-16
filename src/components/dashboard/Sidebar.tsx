@@ -51,9 +51,9 @@ const NAV_BY_ROLE = {
   ],
   admin: [
     { name: "Dashboard", href: "/admin/dashboard", icon: ShieldCheck },
-    { name: "User Management", href: "/admin/students", icon: Users },
+    { name: "Users", href: "/admin/students", icon: Users },
+    { name: "Courses", href: "/admin/courses", icon: BookOpen },
     { name: "Content", href: "/admin/content", icon: Layout },
-    { name: "Verification", href: "/admin/verification", icon: ShieldCheck },
     { name: "AI Tools", href: "/admin/ai-tools", icon: Brain },
   ],
 };

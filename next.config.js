@@ -6,7 +6,7 @@ const nextConfig = {
       // Proxy all /api/* requests to the FastAPI backend
       {
         source: "/api/:path*",
-        destination: `${backendUrl}/api/:path*`,
+        destination: `${backendUrl}/:path*`,
       },
     ];
   },

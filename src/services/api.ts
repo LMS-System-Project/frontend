@@ -317,5 +317,59 @@ export const api = {
       studyPartners: async () => apiFetch("/student/collab/study-partners"),
     },
   },
+
+  admin: {
+    dashboard: async () => {
+      return apiFetch("/admin/dashboard");
+    },
+
+    users: {
+      list: async (role?: string, search?: string) => {
+        const params = new URLSearchParams();
+        if (role) params.set("role", role);
+        if (search) params.set("search", search);
+        const qs = params.toString();
+        return apiFetch(`/admin/users${qs ? `?${qs}` : ""}`);
+      },
+      create: async (data: {
+        email: string;
+        password: string;
+        full_name: string;
+        role: string;
+        department?: string;
+      }) => {
+        return apiFetch("/admin/users", {
+          method: "POST",
+          body: JSON.stringify(data),
+        });
+      },
+      update: async (
+        id: string,
+        data: { full_name?: string; role?: string; department?: string }
+      ) => {
+        return apiFetch(`/admin/users/${id}`, {
+          method: "PUT",
+          body: JSON.stringify(data),
+        });
+      },
+      delete: async (id: string) => {
+        return apiFetch(`/admin/users/${id}`, {
+          method: "DELETE",
+        });
+      },
+    },
+
+    courses: {
+      list: async (status?: string) => {
+        const qs = status ? `?status=${status}` : "";
+        return apiFetch(`/admin/courses${qs}`);
+      },
+      delete: async (id: string) => {
+        return apiFetch(`/admin/courses/${id}`, {
+          method: "DELETE",
+        });
+      },
+    },
+  },
 };
 
